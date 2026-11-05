@@ -1,20 +1,45 @@
-const SECTION = CHEATSHEET.sections[0];
-
 const app = document.querySelector("#app");
 
 function findItem(hash) {
   const id = decodeURIComponent(hash.replace(/^#/, ""));
   if (!id) return null;
-  return SECTION.items.find((item) => item.id === id) || null;
+  for (const section of CHEATSHEET.sections) {
+    const item = section.items.find((entry) => entry.id === id);
+    if (item) return { section, item };
+  }
+  return null;
 }
 
-function makeSig(name, tokens) {
+function callName(item) {
+  return item.group ? `${item.group}.${item.name}` : item.name;
+}
+
+function sectionItems(section) {
+  if (!section.order) return section.items;
+  const byId = new Map(section.items.map((item) => [item.id, item]));
+  const ordered = section.order.map((id) => byId.get(id)).filter(Boolean);
+  for (const item of section.items) {
+    if (!ordered.includes(item)) ordered.push(item);
+  }
+  return ordered;
+}
+
+function activeSection() {
+  const id = decodeURIComponent(location.hash.replace(/^#/, ""));
+  return CHEATSHEET.sections.find((section) => section.id === id) || CHEATSHEET.sections[0];
+}
+
+function makeSig(name, tokens, options = {}) {
   const line = document.createElement("div");
   line.className = "sigline";
 
   const fname = document.createElement("span");
   fname.className = "fname";
   fname.textContent = name;
+  if (options.bare) {
+    line.append(fname);
+    return line;
+  }
 
   const args = document.createElement("span");
   args.className = "fargs";
@@ -63,7 +88,7 @@ function paramNames(item) {
 
 function matches(item, query) {
   if (!query) return true;
-  const haystack = [item.name, ...paramNames(item)].join(" ").toLowerCase();
+  const haystack = [item.name, item.group || "", ...paramNames(item)].join(" ").toLowerCase();
   return query
     .toLowerCase()
     .split(/\s+/)
@@ -116,7 +141,8 @@ function orderedParams(item) {
   return order.map((name) => ({ name, tokens: grouped.get(name) }));
 }
 
-function renderIndex() {
+function renderIndex(section) {
+  const current = section || activeSection();
   const sheet = document.createElement("div");
   sheet.className = "sheet";
 
@@ -129,7 +155,7 @@ function renderIndex() {
 
   const lede = document.createElement("p");
   lede.className = "lede";
-  lede.textContent = SECTION.lede;
+  lede.textContent = "Pick a group. The most used names are first.";
 
   const legend = document.createElement("ul");
   legend.className = "legend";
@@ -143,40 +169,67 @@ function renderIndex() {
 
   const searchbar = document.createElement("div");
   searchbar.className = "searchbar";
+
+  const tabs = document.createElement("div");
+  tabs.className = "tabs";
+  tabs.setAttribute("role", "tablist");
+  for (const entry of CHEATSHEET.sections) {
+    const tab = document.createElement("a");
+    tab.className = "tab";
+    tab.href = `#${entry.id}`;
+    tab.textContent = entry.title;
+    tab.setAttribute("role", "tab");
+    if (entry.id === current.id) tab.setAttribute("aria-current", "page");
+    tabs.append(tab);
+  }
+
   const input = document.createElement("input");
   input.type = "search";
-  input.placeholder = "Filter by name or parameter";
+  input.placeholder = "Filter by name";
   input.autocomplete = "off";
   input.spellcheck = false;
-  input.setAttribute("aria-label", "Filter built-in functions");
+  input.setAttribute("aria-label", "Filter the cheat sheet");
   const count = document.createElement("p");
   count.className = "count";
   count.setAttribute("aria-live", "polite");
-  searchbar.append(input, count);
+  searchbar.append(tabs, input, count);
 
   const list = document.createElement("div");
-  list.className = "list";
+  list.className = current.id === "numbers" ? "list wide-names" : "list";
 
-  function paint() {
-    const query = input.value.trim();
-    const items = SECTION.items.filter((item) => matches(item, query));
+  function paintList(list, items) {
     list.replaceChildren();
     if (!items.length) {
       const empty = document.createElement("p");
       empty.className = "empty";
-      empty.textContent = "No function matches.";
+      empty.textContent = "No match.";
       list.append(empty);
-    } else {
-      for (const item of items) {
-        const link = document.createElement("a");
-        link.className = "fn";
-        link.href = `#${encodeURIComponent(item.id)}`;
-        for (const form of item.forms) link.append(makeSig(item.name, form));
-        list.append(link);
-      }
+      return;
     }
-    const noun = items.length === 1 ? "function" : "functions";
-    count.textContent = query ? `${items.length} ${noun}` : `${items.length} ${noun}`;
+    let group = null;
+    for (const item of items) {
+      if (item.group && item.group !== group) {
+        group = item.group;
+        const label = document.createElement("p");
+        label.className = "group";
+        label.textContent = group;
+        list.append(label);
+      }
+      const link = document.createElement("a");
+      link.className = "fn";
+      link.href = `#${encodeURIComponent(item.id)}`;
+      if (item.kind === "attr") link.append(makeSig(item.name, [], { bare: true }));
+      else for (const form of item.forms) link.append(makeSig(item.name, form));
+      list.append(link);
+    }
+  }
+
+  function paint() {
+    const query = input.value.trim();
+    const items = sectionItems(current).filter((item) => matches(item, query));
+    paintList(list, items);
+    const noun = current.title.toLowerCase();
+    count.textContent = `${items.length} ${noun}`;
   }
 
   input.addEventListener("input", paint);
@@ -184,7 +237,7 @@ function renderIndex() {
 
   const foot = document.createElement("p");
   foot.className = "foot";
-  foot.textContent = "Built-in functions. Open one for the purpose, the arguments, and an example.";
+  foot.textContent = "Open a row when the name is not enough.";
 
   sheet.append(kicker, title, lede, legend, sentinel, searchbar, list, foot);
   app.replaceChildren(sheet);
@@ -206,39 +259,44 @@ function legendItem(cls, codeText, rest) {
   return li;
 }
 
-function renderDetail(item) {
+function renderDetail(item, section) {
   const sheet = document.createElement("div");
   sheet.className = "sheet detail";
 
   const back = document.createElement("a");
   back.className = "back";
-  back.href = "#";
-  back.textContent = "← All functions";
+  back.href = `#${section.id}`;
+  back.textContent = `← ${section.title}`;
 
   const kicker = document.createElement("p");
   kicker.className = "kicker";
-  kicker.textContent = "Built-in function";
+  kicker.textContent = section.title;
 
   const title = document.createElement("h1");
-  title.textContent = item.name;
+  title.textContent = callName(item);
 
   const purpose = document.createElement("p");
   purpose.className = "purpose";
   purpose.textContent = item.purpose;
 
-  const sigHeading = document.createElement("h2");
-  sigHeading.textContent = item.forms.length > 1 ? "Forms" : "Signature";
-  const sigs = document.createElement("div");
-  sigs.className = "sigs";
-  for (const form of item.forms) sigs.append(makeSig(item.name, form));
+  sheet.append(back, kicker, title, purpose);
 
-  sheet.append(back, kicker, title, purpose, sigHeading, sigs);
+  const shownName = callName(item);
+  if (item.kind !== "attr") {
+    const sigHeading = document.createElement("h2");
+    sigHeading.textContent = item.forms.length > 1 ? "Forms" : "Signature";
+    const sigs = document.createElement("div");
+    sigs.className = "sigs";
+    for (const form of item.forms) sigs.append(makeSig(shownName, form));
+    sheet.append(sigHeading, sigs);
+  }
 
   const params = orderedParams(item);
-  const paramHeading = document.createElement("h2");
-  paramHeading.textContent = "Parameters";
-  sheet.append(paramHeading);
-  if (!params.length) {
+  if (item.kind !== "attr") {
+    const paramHeading = document.createElement("h2");
+    paramHeading.textContent = "Parameters";
+    sheet.append(paramHeading);
+    if (!params.length) {
     const none = document.createElement("p");
     none.className = "none";
     none.textContent = "Takes no arguments.";
@@ -267,6 +325,7 @@ function renderDetail(item) {
       block.append(head, desc);
       sheet.append(block);
     }
+    }
   }
 
   const exampleHeading = document.createElement("h2");
@@ -288,13 +347,13 @@ function renderDetail(item) {
   }
 
   app.replaceChildren(sheet);
-  document.title = `${item.name} · Python cheat sheet`;
+  document.title = `${callName(item)} · Python cheat sheet`;
 }
 
 function render() {
-  const item = findItem(location.hash);
-  if (item) renderDetail(item);
-  else renderIndex();
+  const found = findItem(location.hash);
+  if (found) renderDetail(found.item, found.section);
+  else renderIndex(activeSection());
   window.scrollTo(0, 0);
 }
 
@@ -302,7 +361,9 @@ window.addEventListener("hashchange", render);
 window.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   if (document.activeElement && document.activeElement.tagName === "INPUT") return;
-  if (location.hash) location.hash = "";
+  if (!location.hash) return;
+  const found = findItem(location.hash);
+  location.hash = found ? found.section.id : "";
 });
 
 render();

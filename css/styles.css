@@ -32,6 +32,51 @@ body {
   padding: 1.75rem 1.25rem 3.5rem;
 }
 
+.detail { max-width: 46rem; }
+
+.tabs {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 0.15rem 0 0.7rem;
+  scrollbar-width: thin;
+  scrollbar-color: #c8bfb2 transparent;
+}
+
+.tabs::-webkit-scrollbar { height: 8px; }
+.tabs::-webkit-scrollbar-thumb {
+  background: #c8bfb2;
+  border-radius: 99px;
+}
+
+.tab {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tab[aria-current="page"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.group {
+  margin: 0.95rem 0 0;
+  font-weight: 600;
+}
+
+.wide-names .sigline {
+  grid-template-columns: 18ch minmax(0, 1fr);
+}
+
 .kicker {
   margin: 0;
   color: var(--muted);
@@ -255,5 +300,6 @@ pre.out {
   .sheet { padding: 1.25rem 1rem 2.5rem; }
   .searchbar { margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem; }
   h1 { font-size: 1.55rem; }
-  .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
+  .sigline,
+  .wide-names .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
 }

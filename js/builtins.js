@@ -1158,3 +1158,15 @@ const CHEATSHEET = {
     },
   ],
 };
+
+// Shown most-used first, so a glance hits the names you actually forget.
+CHEATSHEET.sections[0].order = [
+  "print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple",
+  "bool", "type", "isinstance", "enumerate", "zip", "sorted", "reversed", "min", "max", "sum",
+  "abs", "round", "open", "input", "map", "filter", "any", "all", "next", "iter",
+  "getattr", "setattr", "hasattr", "super", "repr", "format", "id", "hash", "dir", "help",
+  "pow", "divmod", "hex", "bin", "oct", "ord", "chr", "bytes", "bytearray", "slice",
+  "property", "classmethod", "staticmethod", "object", "callable", "issubclass", "delattr", "vars", "globals", "locals",
+  "frozenset", "complex", "eval", "exec", "compile", "memoryview", "breakpoint", "ascii", "aiter", "anext",
+  "__import__",
+];
