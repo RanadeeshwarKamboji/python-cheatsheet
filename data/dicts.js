@@ -1,0 +1,126 @@
+// Dict methods.
+// Required arguments and defaults are marked with arg.req and arg.def from js/constants.js.
+// `order` is the page order, most-used first. The items below follow it.
+
+CHEATSHEET.sections.push({
+  id: "dicts",
+  title: "Dict",
+  order: [
+    "dict-get",
+    "dict-keys",
+    "dict-values",
+    "dict-items",
+    "dict-update",
+    "dict-pop",
+    "dict-setdefault",
+    "dict-popitem",
+    "dict-clear",
+    "dict-copy",
+    "dict-fromkeys",
+  ],
+  items: [
+    {
+      id: "dict-get",
+      name: "get",
+      purpose: "The value for key, or default when the key is missing. Default is None. A missing key does not raise.",
+      forms: [[arg.req("key"), arg.def("default", "None")]],
+      params: {
+        key: "The key to look up. You have to pass it.",
+        default: "What to return when the key is missing. Default None.",
+      },
+      example: { code: "{'a': 1}.get('z', 0)", result: "0" },
+    },
+    {
+      id: "dict-keys",
+      name: "keys",
+      purpose: "A view of the keys, in insertion order. It follows later changes to the dict.",
+      forms: [[]],
+      params: {},
+      example: { code: "list({'a': 1, 'b': 2}.keys())", result: "['a', 'b']" },
+    },
+    {
+      id: "dict-values",
+      name: "values",
+      purpose: "A view of the values, in insertion order. It follows later changes to the dict.",
+      forms: [[]],
+      params: {},
+      example: { code: "list({'a': 1, 'b': 2}.values())", result: "[1, 2]" },
+    },
+    {
+      id: "dict-items",
+      name: "items",
+      purpose: "A view of (key, value) pairs, in insertion order. It follows later changes to the dict.",
+      forms: [[]],
+      params: {},
+      example: { code: "list({'a': 1, 'b': 2}.items())", result: "[('a', 1), ('b', 2)]" },
+    },
+    {
+      id: "dict-update",
+      name: "update",
+      purpose: "Merge another mapping, pairs, or keywords into this dict. Existing keys are overwritten. update() with nothing changes nothing. Returns None.",
+      forms: [[arg.opt("other"), arg.opt("**kwargs")]],
+      params: {
+        other: "A mapping, or an iterable of (key, value) pairs. Leave it out to merge keywords only.",
+        "**kwargs": "Extra keys written by name: update(b=2). Later names overwrite earlier ones.",
+      },
+      example: { code: "d = {'a': 1}\nd.update({'b': 2})\nd", result: "{'a': 1, 'b': 2}" },
+    },
+    {
+      id: "dict-pop",
+      name: "pop",
+      purpose: "Remove key and return its value. With no default, a missing key raises KeyError.",
+      forms: [[arg.req("key"), arg.opt("default")]],
+      params: {
+        key: "The key to remove. You have to pass it.",
+        default: "What to return when the key is missing. Leave it out and a missing key raises KeyError.",
+      },
+      example: { code: "{'a': 1, 'b': 2}.pop('a')", result: "1" },
+    },
+    {
+      id: "dict-setdefault",
+      name: "setdefault",
+      purpose: "Return the value for key. When the key is missing, insert default and return that. Default is None.",
+      forms: [[arg.req("key"), arg.def("default", "None")]],
+      params: {
+        key: "The key to look up. You have to pass it.",
+        default: "Value to insert when the key is missing. Default None. An existing key is left alone.",
+      },
+      example: { code: "d = {}\nd.setdefault('a', 1)\nd", result: "{'a': 1}" },
+    },
+    {
+      id: "dict-popitem",
+      name: "popitem",
+      purpose: "Remove and return the last inserted pair, as (key, value). An empty dict raises KeyError.",
+      forms: [[]],
+      params: {},
+      example: { code: "{'a': 1}.popitem()", result: "('a', 1)" },
+    },
+    {
+      id: "dict-clear",
+      name: "clear",
+      purpose: "Remove every item. Returns None.",
+      forms: [[]],
+      params: {},
+      example: { code: "d = {'a': 1}\nd.clear()\nd", result: "{}" },
+    },
+    {
+      id: "dict-copy",
+      name: "copy",
+      purpose: "A new dict with the same pairs. Shallow: nested values are still shared.",
+      forms: [[]],
+      params: {},
+      example: { code: "{'a': 1}.copy()", result: "{'a': 1}" },
+    },
+    {
+      id: "dict-fromkeys",
+      name: "fromkeys",
+      purpose: "A new dict whose keys come from iterable. Every key gets the same value, default None. Call it on the class. A mutable value is shared by every key.",
+      forms: [[arg.req("iterable"), arg.def("value", "None")]],
+      params: {
+        iterable: "Keys for the new dict. You have to pass it.",
+        value: "The value stored for every key. Default None. One list here is the same list on every key.",
+      },
+      example: { code: "dict.fromkeys(['a', 'b'], 0)", result: "{'a': 0, 'b': 0}" },
+    },
+  ],
+});

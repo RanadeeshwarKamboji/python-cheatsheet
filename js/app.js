@@ -66,7 +66,9 @@ function makeSig(name, tokens, options = {}) {
 }
 
 function displayName(name) {
-  return name.replace(/^\*+/, "");
+  const bare = name.replace(/^\*+/, "");
+  if (bare === "args" || bare === "kwargs") return name;
+  return bare;
 }
 
 function appendSyn(parent, text) {
@@ -194,14 +196,19 @@ function renderIndex(section) {
   searchbar.append(tabs, input, count);
 
   const list = document.createElement("div");
-  list.className = current.id === "numbers" ? "list wide-names" : "list";
+  list.className = listClass(current);
 
-  function paintList(list, items) {
+  function paintList(list, items, query) {
     list.replaceChildren();
     if (!items.length) {
       const empty = document.createElement("p");
-      empty.className = "empty";
-      empty.textContent = "No match.";
+      if (!query && current.note) {
+        empty.className = "section-note";
+        empty.textContent = current.note;
+      } else {
+        empty.className = "empty";
+        empty.textContent = "No match.";
+      }
       list.append(empty);
       return;
     }
@@ -226,9 +233,12 @@ function renderIndex(section) {
   function paint() {
     const query = input.value.trim();
     const items = sectionItems(current).filter((item) => matches(item, query));
-    paintList(list, items);
-    const noun = current.title.toLowerCase();
-    count.textContent = `${items.length} ${noun}`;
+    paintList(list, items, query);
+    if (!query && current.note && sectionItems(current).length === 0) {
+      count.textContent = "";
+    } else {
+      count.textContent = `${items.length} ${current.title.toLowerCase()}`;
+    }
   }
 
   input.addEventListener("input", paint);
@@ -238,7 +248,8 @@ function renderIndex(section) {
   foot.className = "foot";
   foot.textContent = "Open a row when the name is not enough.";
 
-  sheet.append(kicker, title, lede, legend, sentinel, searchbar, list, foot);
+  sheet.append(kicker, title, lede, legend, sentinel, searchbar, list);
+  if (sectionItems(current).length) sheet.append(foot);
   app.replaceChildren(sheet);
   document.title = "Python cheat sheet";
 
@@ -247,6 +258,13 @@ function renderIndex(section) {
     { threshold: 0 },
   );
   observer.observe(sentinel);
+}
+
+function listClass(section) {
+  const widest = Math.max(0, ...sectionItems(section).map((item) => item.name.length));
+  if (widest > 18) return "list wider-names";
+  if (widest > 13) return "list wide-names";
+  return "list";
 }
 
 function legendItem(cls, codeText, rest) {

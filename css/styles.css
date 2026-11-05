@@ -77,6 +77,15 @@ body {
   grid-template-columns: 18ch minmax(0, 1fr);
 }
 
+.wider-names .sigline {
+  grid-template-columns: 28ch minmax(0, 1fr);
+}
+
+.section-note {
+  margin: 0.4rem 0 0;
+  max-width: 38rem;
+}
+
 .kicker {
   margin: 0;
   color: var(--muted);
@@ -301,5 +310,6 @@ pre.out {
   .searchbar { margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem; }
   h1 { font-size: 1.55rem; }
   .sigline,
-  .wide-names .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
+  .wide-names .sigline,
+  .wider-names .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
 }
