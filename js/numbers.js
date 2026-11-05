@@ -1,6 +1,6 @@
-// Number methods. Same item shape as js/builtins.js.
-// `group` is the type heading. `kind: "attr"` is a value you read, not a call.
-// `order` is most-used first.
+// Number methods.
+// Required arguments and defaults are marked with arg.req and arg.def from js/constants.js.
+// `order` is the page order, most-used first. The items below follow it.
 
 CHEATSHEET.sections.push({
   id: "numbers",
@@ -21,32 +21,14 @@ CHEATSHEET.sections.push({
   ],
   items: [
     {
-      id: "int-bit_count",
-      group: "int",
-      name: "bit_count",
-      purpose: "How many 1 bits the number has. 10 is 0b1010, so the count is 2.",
-      forms: [[]],
-      params: {},
-      example: { code: "(10).bit_count()", result: "2" },
-    },
-    {
-      id: "int-bit_length",
-      group: "int",
-      name: "bit_length",
-      purpose: "How many bits you need to write the number, ignoring the sign. 10 needs 4 bits.",
-      forms: [[]],
-      params: {},
-      example: { code: "(10).bit_length()", result: "4" },
-    },
-    {
       id: "int-to_bytes",
       group: "int",
       name: "to_bytes",
       purpose: "Turn the number into bytes. All three arguments have defaults, so (255).to_bytes() is b'\\xff'. It raises OverflowError when the number does not fit in length bytes.",
       forms: [[
-        { kind: "def", name: "length", value: "1" },
-        { kind: "def", name: "byteorder", value: "'big'" },
-        { kind: "def", name: "signed", value: "False" },
+        arg.def("length", "1"),
+        arg.def("byteorder", "'big'"),
+        arg.def("signed", "False"),
       ]],
       params: {
         length: "How many bytes to produce. Default 1. Use more when the number is bigger than 255.",
@@ -61,9 +43,9 @@ CHEATSHEET.sections.push({
       name: "from_bytes",
       purpose: "Build an int from bytes. Call it on the class: int.from_bytes(b'\\xff\\x00', 'little') is 255.",
       forms: [[
-        { kind: "req", name: "data" },
-        { kind: "def", name: "byteorder", value: "'big'" },
-        { kind: "def", name: "signed", value: "False" },
+        arg.req("data"),
+        arg.def("byteorder", "'big'"),
+        arg.def("signed", "False"),
       ]],
       params: {
         data: "The bytes to read, such as b'\\xff\\x00'. You have to pass this.",
@@ -71,6 +53,24 @@ CHEATSHEET.sections.push({
         signed: "Pass signed=True to allow a negative result. Default False reads the bytes as a positive number.",
       },
       example: { code: "int.from_bytes(b'\\xff\\x00', 'little')", result: "255" },
+    },
+    {
+      id: "int-bit_length",
+      group: "int",
+      name: "bit_length",
+      purpose: "How many bits you need to write the number, ignoring the sign. 10 needs 4 bits.",
+      forms: [[]],
+      params: {},
+      example: { code: "(10).bit_length()", result: "4" },
+    },
+    {
+      id: "int-bit_count",
+      group: "int",
+      name: "bit_count",
+      purpose: "How many 1 bits the number has. 10 is 0b1010, so the count is 2.",
+      forms: [[]],
+      params: {},
+      example: { code: "(10).bit_count()", result: "2" },
     },
     {
       id: "int-as_integer_ratio",
@@ -113,20 +113,11 @@ CHEATSHEET.sections.push({
       group: "float",
       name: "fromhex",
       purpose: "Build a float from a hex string, usually one that came from float.hex(). Call it on the class.",
-      forms: [[{ kind: "req", name: "string" }]],
+      forms: [[arg.req("string")]],
       params: {
         string: "The hex text to convert, such as '0x1.8p0'. You have to pass it.",
       },
       example: { code: "float.fromhex('0x1.8p0')", result: "1.5" },
-    },
-    {
-      id: "complex-conjugate",
-      group: "complex",
-      name: "conjugate",
-      purpose: "Flip the sign of the imaginary part. 1+2j becomes 1-2j.",
-      forms: [[]],
-      params: {},
-      example: { code: "(1+2j).conjugate()", result: "(1-2j)" },
     },
     {
       id: "complex-real",
@@ -148,5 +139,14 @@ CHEATSHEET.sections.push({
       params: {},
       example: { code: "(1+2j).imag", result: "2.0" },
     },
+    {
+      id: "complex-conjugate",
+      group: "complex",
+      name: "conjugate",
+      purpose: "Flip the sign of the imaginary part. 1+2j becomes 1-2j.",
+      forms: [[]],
+      params: {},
+      example: { code: "(1+2j).conjugate()", result: "(1-2j)" },
+    }
   ],
 });

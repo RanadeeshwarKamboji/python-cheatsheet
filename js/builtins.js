@@ -1,1172 +1,1213 @@
-// Python cheat sheet data.
-//
-// Add a later section (built-in types, for example) by pushing another object
-// onto CHEATSHEET.sections. Each item uses this shape:
-//
-//   id        hash id, unique in the section
-//   name      text shown in the list
-//   purpose   what it does
-//   forms     one array per call form. Tokens inside a form:
-//               { kind: "req", name }                 required, drawn in red
-//               { kind: "def", name, value }          has a default, drawn in green
-//               { kind: "opt", name }                 optional, no single default, green
-//               { kind: "mark", text }                kept in the data, not shown in the UI
-//   params    name -> one-sentence definition
-//   example   { code, result, note? }
-//
-// Signatures follow Python 3.13.
+// Built-in functions.
+// Required arguments and defaults are marked with arg.req and arg.def from js/constants.js.
+// `order` is the page order, most-used first. The items below follow it.
 
-const CHEATSHEET = {
-  version: "3.13",
-  sections: [
-    {
-      id: "functions",
-      title: "Built-in functions",
-      lede: "Every built-in function, in one column. Red arguments you have to pass. Green arguments you can leave out.",
-      items: [
-        {
-          id: "abs",
-          name: "abs",
-          purpose: "Return the size of a number, ignoring its sign. For a complex number, return the magnitude.",
-          forms: [[{ kind: "req", name: "number" }, { kind: "mark", text: "/" }]],
-          params: {
-            number: "An int, a float, or an object with __abs__. Complex numbers are allowed; the result is the distance from zero.",
-          },
-          example: { code: "abs(-3)", result: "3" },
-        },
-        {
-          id: "aiter",
-          name: "aiter",
-          purpose: "Return the async iterator of an async iterable. Same idea as iter(), but there is no two-argument sentinel form. Advance the result with anext().",
-          forms: [[{ kind: "req", name: "async_iterable" }, { kind: "mark", text: "/" }]],
-          params: {
-            async_iterable: "An object with __aiter__, such as an async generator. aiter(x) calls x.__aiter__().",
-          },
-          example: {
-            code: "import asyncio\n\nasync def gen():\n    yield 1\n\nasync def main():\n    it = aiter(gen())\n    return await anext(it)\n\nasyncio.run(main())",
-            result: "1",
-          },
-        },
-        {
-          id: "all",
-          name: "all",
-          purpose: "Return True if every element is true. An empty iterable is True, because nothing in it failed the test.",
-          forms: [[{ kind: "req", name: "iterable" }, { kind: "mark", text: "/" }]],
-          params: {
-            iterable: "Items tested with the usual truth rules. Stops at the first false element.",
-          },
-          example: { code: "all([True, 1, 'x'])", result: "True" },
-        },
-        {
-          id: "anext",
-          name: "anext",
-          purpose: "Return an awaitable for the next value of an async iterator. Await it. With no default, an exhausted iterator raises StopAsyncIteration.",
-          forms: [
-            [{ kind: "req", name: "async_iterator" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "async_iterator" },
-              { kind: "req", name: "default" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            async_iterator: "An object with __anext__. The call returns an awaitable; the value comes out when you await it.",
-            default: "Value to return when the iterator is exhausted. It has no preset: you either pass your own fallback, or leave this form unused and let StopAsyncIteration raise.",
-          },
-          example: {
-            code: "import asyncio\n\nasync def gen():\n    yield 1\n\nasync def main():\n    it = aiter(gen())\n    await anext(it)\n    return await anext(it, 0)\n\nasyncio.run(main())",
-            result: "0",
-          },
-        },
-        {
-          id: "any",
-          name: "any",
-          purpose: "Return True if at least one element is true. An empty iterable is False.",
-          forms: [[{ kind: "req", name: "iterable" }, { kind: "mark", text: "/" }]],
-          params: {
-            iterable: "Items tested with the usual truth rules. Stops at the first true element.",
-          },
-          example: { code: "any([0, '', 5])", result: "True" },
-        },
-        {
-          id: "ascii",
-          name: "ascii",
-          purpose: "Return a printable representation like repr(), with non-ASCII characters escaped using \\x, \\u, or \\U.",
-          forms: [[{ kind: "req", name: "object" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Any object. The result is a plain ASCII string, including the quotes repr() would use.",
-          },
-          example: {
-            code: "ascii('café')",
-            result: "\"'caf\\\\xe9'\"",
-            note: "This is what the prompt prints. The string itself contains one backslash: 'caf\\xe9'.",
-          },
-        },
-        {
-          id: "bin",
-          name: "bin",
-          purpose: "Convert an integer to a binary string with a 0b prefix. Negative numbers keep the sign in front of the prefix.",
-          forms: [[{ kind: "req", name: "number" }, { kind: "mark", text: "/" }]],
-          params: {
-            number: "An int, or an object with __index__ that returns an int.",
-          },
-          example: { code: "bin(10)", result: "'0b1010'" },
-        },
-        {
-          id: "bool",
-          name: "bool",
-          purpose: "Return True or False using the normal truth test. bool() with no argument is False. bool is a subclass of int, and it cannot be subclassed further.",
-          forms: [[{ kind: "def", name: "object", value: "False" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Value to test. Defaults to False, so a bare bool() is False. Numbers other than zero, and non-empty containers, are True.",
-          },
-          example: { code: "bool(0)", result: "False" },
-        },
-        {
-          id: "breakpoint",
-          name: "breakpoint",
-          purpose: "Drop into the debugger at this line. It calls sys.breakpointhook(), which by default is pdb.set_trace. Both argument forms are optional and are passed straight through.",
-          forms: [[
-            { kind: "opt", name: "*args" },
-            { kind: "opt", name: "**kws" },
-          ]],
-          params: {
-            "*args": "Extra arguments passed on to the debugger. The usual debugger, pdb, expects none.",
-            "**kws": "Extra named arguments passed on to the debugger.",
-          },
-          example: {
-            code: "breakpoint()",
-            result: "Drops into pdb at this line.",
-          },
-        },
-        {
-          id: "bytearray",
-          name: "bytearray",
-          purpose: "A mutable sequence of integers in the range 0 to 255. With no arguments the array is empty. An int argument sets the length and fills it with zero bytes.",
-          forms: [
-            [{ kind: "def", name: "source", value: "b''" }],
-            [
-              { kind: "req", name: "source" },
-              { kind: "req", name: "encoding" },
-              { kind: "def", name: "errors", value: "'strict'" },
-            ],
-          ],
-          params: {
-            source: "Initial contents. Defaults to b'', an empty array. An int sets the length. An iterable of ints, or a buffer, supplies the bytes. A string is only valid together with encoding.",
-            encoding: "Required when source is a string. The string is encoded to bytes with this codec, such as 'utf-8' or 'ascii'.",
-            errors: "How to handle encoding failures. Default 'strict' raises UnicodeEncodeError. Also 'ignore', 'replace', and the other codecs error handlers.",
-          },
-          example: { code: "bytearray([65, 66])", result: "bytearray(b'AB')" },
-        },
-        {
-          id: "bytes",
-          name: "bytes",
-          purpose: "An immutable sequence of integers in the range 0 to 255. bytes() is b''. The constructor accepts the same kinds of values as bytearray.",
-          forms: [
-            [{ kind: "def", name: "source", value: "b''" }],
-            [
-              { kind: "req", name: "source" },
-              { kind: "req", name: "encoding" },
-              { kind: "def", name: "errors", value: "'strict'" },
-            ],
-          ],
-          params: {
-            source: "Initial contents. Defaults to b''. An int sets the length, filled with zero bytes. A buffer is copied. A string needs encoding.",
-            encoding: "Required when source is a str. Names the codec used to encode it.",
-            errors: "How encoding errors are handled. Default 'strict' raises. Keyword-friendly: errors='ignore' is valid.",
-          },
-          example: { code: "bytes('AB', 'ascii')", result: "b'AB'" },
-        },
-        {
-          id: "callable",
-          name: "callable",
-          purpose: "Return True if the object looks callable. True does not promise the call will succeed. Classes are callable; instances are callable when their class defines __call__.",
-          forms: [[{ kind: "req", name: "object" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Anything. False means a call will fail. True means it might work.",
-          },
-          example: { code: "callable(len)", result: "True" },
-        },
-        {
-          id: "chr",
-          name: "chr",
-          purpose: "Return the one-character string for a Unicode code point. chr(65) is 'A'. This is the inverse of ord(). The valid range is 0 through 1,114,111.",
-          forms: [[{ kind: "req", name: "codepoint" }, { kind: "mark", text: "/" }]],
-          params: {
-            codepoint: "An integer from 0 to 0x10FFFF. Values outside that range raise ValueError.",
-          },
-          example: { code: "chr(65)", result: "'A'" },
-        },
-        {
-          id: "classmethod",
-          name: "classmethod",
-          purpose: "Turn a function into a class method. The method receives the class as its first argument, usually named cls, whether you call it on the class or on an instance.",
-          forms: [[{ kind: "req", name: "function" }, { kind: "mark", text: "/" }]],
-          params: {
-            function: "The function to wrap. As a decorator, write @classmethod above the def.",
-          },
-          example: {
-            code: "class C:\n    @classmethod\n    def make(cls):\n        return cls.__name__\n\nC.make()",
-            result: "'C'",
-          },
-        },
-        {
-          id: "compile",
-          name: "compile",
-          purpose: "Compile source into a code object that exec() or eval() can run. mode is 'exec' for statements, 'eval' for one expression, or 'single' for one interactive statement.",
-          forms: [[
-            { kind: "req", name: "source" },
-            { kind: "req", name: "filename" },
-            { kind: "req", name: "mode" },
-            { kind: "def", name: "flags", value: "0" },
-            { kind: "def", name: "dont_inherit", value: "False" },
-            { kind: "def", name: "optimize", value: "-1" },
-          ]],
-          params: {
-            source: "A string of code, a bytes string, or an AST object.",
-            filename: "Name used in tracebacks. Use a real path, or '<string>' when the code did not come from a file.",
-            mode: "'exec', 'eval', or 'single'.",
-            flags: "Compiler flag bits, usually from the ast module. Default 0 means no extra flags. Future-feature flags can be OR-ed in.",
-            dont_inherit: "When true, ignore compiler flags from the surrounding code and use flags alone. Default False.",
-            optimize: "Optimization level. Default -1 uses the interpreter's -O setting. 0 keeps asserts, 1 removes them, 2 also drops docstrings.",
-          },
-          example: {
-            code: "eval(compile('2 + 3', '<string>', 'eval'))",
-            result: "5",
-          },
-        },
-        {
-          id: "complex",
-          name: "complex",
-          purpose: "Build a complex number. No arguments returns 0j. One argument can be a number or a string such as '1+2j'. real and imag default to 0.",
-          forms: [[
-            { kind: "def", name: "real", value: "0" },
-            { kind: "def", name: "imag", value: "0" },
-          ]],
-          params: {
-            real: "Real part. Default 0. A single string such as '1+2j' is read as a whole complex number.",
-            imag: "Imaginary part. Default 0. complex(imag=-4.5) is -4.5j.",
-          },
-          example: { code: "complex(1, 2)", result: "(1+2j)" },
-        },
-        {
-          id: "delattr",
-          name: "delattr",
-          purpose: "Delete an attribute by string name. delattr(obj, 'n') is the same as del obj.n.",
-          forms: [[
-            { kind: "req", name: "object" },
-            { kind: "req", name: "name" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            object: "The object whose attribute is deleted. It must allow the deletion.",
-            name: "Attribute name as a string. It does not have to be a valid identifier.",
-          },
-          example: {
-            code: "box = type('Box', (), {})()\nbox.n = 1\ndelattr(box, 'n')\nhasattr(box, 'n')",
-            result: "False",
-          },
-        },
-        {
-          id: "dict",
-          name: "dict",
-          purpose: "Create a dictionary. No arguments means an empty dict. You can copy another dict, pass pairs, or write entries by name, as in dict(a=1).",
-          forms: [
-            [{ kind: "opt", name: "**kwargs" }],
-            [
-              { kind: "req", name: "mapping" },
-              { kind: "mark", text: "/" },
-              { kind: "opt", name: "**kwargs" },
-            ],
-            [
-              { kind: "req", name: "iterable" },
-              { kind: "mark", text: "/" },
-              { kind: "opt", name: "**kwargs" },
-            ],
-          ],
-          params: {
-            "**kwargs": "Optional keywords, each stored as an entry. dict(a=1) is {'a': 1}. Leave them out for an empty dict.",
-            mapping: "Another dict, or any mapping, to copy. Pass it in order. dict(mapping=x) does not copy x; it stores a key named mapping.",
-            iterable: "A sequence of pairs, like [('a', 1), ('b', 2)].",
-          },
-          example: { code: "dict([('a', 1), ('b', 2)])", result: "{'a': 1, 'b': 2}" },
-        },
-        {
-          id: "dir",
-          name: "dir",
-          purpose: "List names. With no argument, return the names in the current local scope. With an object, return a sorted list of its attributes. Intended for the interactive prompt; the list can be incomplete.",
-          forms: [
-            [],
-            [{ kind: "req", name: "object" }, { kind: "mark", text: "/" }],
-          ],
-          params: {
-            object: "Object whose attribute names you want. If it defines __dir__, that method supplies the list.",
-          },
-          example: {
-            code: "class Box:\n    n = 1\n\n'n' in dir(Box)",
-            result: "True",
-          },
-        },
-        {
-          id: "divmod",
-          name: "divmod",
-          purpose: "Return the quotient and remainder of a divided by b, as one pair. For integers this is (a // b, a % b).",
-          forms: [[
-            { kind: "req", name: "a" },
-            { kind: "req", name: "b" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            a: "Dividend. Not a complex number.",
-            b: "Divisor. Not a complex number, and not zero.",
-          },
-          example: { code: "divmod(7, 2)", result: "(3, 1)" },
-        },
-        {
-          id: "enumerate",
-          name: "enumerate",
-          purpose: "Pair each item with a count. The count starts at 0 unless you pass start. Each step yields (count, item).",
-          forms: [[
-            { kind: "req", name: "iterable" },
-            { kind: "def", name: "start", value: "0" },
-          ]],
-          params: {
-            iterable: "Any iterable. The count is generated; it is not read from the items.",
-            start: "First count. Default 0. enumerate(items, start=1) or enumerate(items, 1) both work.",
-          },
-          example: { code: "list(enumerate(['a', 'b'], start=1))", result: "[(1, 'a'), (2, 'b')]" },
-        },
-        {
-          id: "eval",
-          name: "eval",
-          purpose: "Evaluate one expression and return its value. This runs the code you give it. globals and locals default to the namespaces of the caller.",
-          forms: [[
-            { kind: "req", name: "source" },
-            { kind: "mark", text: "/" },
-            { kind: "def", name: "globals", value: "None" },
-            { kind: "def", name: "locals", value: "None" },
-          ]],
-          params: {
-            source: "A string containing an expression, or a code object from compile(..., mode='eval').",
-            globals: "Global namespace dictionary. Default None uses the caller's globals. If the dict has no __builtins__ key, the real builtins are inserted.",
-            locals: "Local namespace. Default None uses globals when globals was passed, otherwise the caller's locals.",
-          },
-          example: { code: "eval('2 + 3')", result: "5" },
-        },
-        {
-          id: "exec",
-          name: "exec",
-          purpose: "Execute statements. The return value is always None. Use a namespace dict if you want to read variables the code assigned. This runs the code you give it.",
-          forms: [[
-            { kind: "req", name: "source" },
-            { kind: "mark", text: "/" },
-            { kind: "def", name: "globals", value: "None" },
-            { kind: "def", name: "locals", value: "None" },
-            { kind: "mark", text: "*" },
-            { kind: "def", name: "closure", value: "None" },
-          ]],
-          params: {
-            source: "A string of statements, or a code object. return, yield, and nonlocal are not allowed at the top level of that string.",
-            globals: "Global namespace. Default None means the caller's globals. Must be a dict when you pass one.",
-            locals: "Local namespace. Default None. Any mapping is accepted.",
-            closure: "Only for a code object that uses variables from an outer function. Default None. Leave it out unless you are building that case by hand.",
-          },
-          example: {
-            code: "ns = {}\nexec('x = 2 + 3', ns)\nns['x']",
-            result: "5",
-          },
-        },
-        {
-          id: "filter",
-          name: "filter",
-          purpose: "Build an iterator of the items for which function(item) is true. If function is None, keep the items that are true by themselves. The result is lazy: wrap it in list() to see it.",
-          forms: [[
-            { kind: "req", name: "function" },
-            { kind: "req", name: "iterable" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            function: "Called on each item. You still pass it when you want the truth test: use None, which drops zeros, empty strings, and other false values.",
-            iterable: "Source of items.",
-          },
-          example: { code: "list(filter(None, [0, 1, '', 'a']))", result: "[1, 'a']" },
-        },
-        {
-          id: "float",
-          name: "float",
-          purpose: "Convert a number or a numeric string to a float. float() with no argument is 0.0. Strings may contain a sign, whitespace, or 'inf' and 'nan'.",
-          forms: [[{ kind: "def", name: "number", value: "0.0" }, { kind: "mark", text: "/" }]],
-          params: {
-            number: "A number or a numeric string. Default 0.0. Floats outside the range raise OverflowError.",
-          },
-          example: { code: "float('1.5')", result: "1.5" },
-        },
-        {
-          id: "format",
-          name: "format",
-          purpose: "Format a value with a format spec. format(value, spec) calls type(value).__format__(value, spec). An empty spec is usually the same as str(value).",
-          forms: [[
-            { kind: "req", name: "value" },
-            { kind: "def", name: "format_spec", value: "''" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            value: "The object to format.",
-            format_spec: "Spec string such as '04d' or '.2f'. Default is the empty string. See the format specification mini-language.",
-          },
-          example: { code: "format(42, '04d')", result: "'0042'" },
-        },
-        {
-          id: "frozenset",
-          name: "frozenset",
-          purpose: "An immutable set. Duplicate values are dropped, and the value cannot be changed later, so it can be a dict key or a member of another set. No arguments means empty.",
-          forms: [[{ kind: "def", name: "iterable", value: "()" }, { kind: "mark", text: "/" }]],
-          params: {
-            iterable: "Values to copy in. Default is an empty tuple, so frozenset() is empty.",
-          },
-          example: { code: "frozenset([1, 1, 2])", result: "frozenset({1, 2})" },
-        },
-        {
-          id: "getattr",
-          name: "getattr",
-          purpose: "Read an attribute by string name. getattr(obj, 'n') is obj.n. Without a default, a missing name raises AttributeError.",
-          forms: [
-            [
-              { kind: "req", name: "object" },
-              { kind: "req", name: "name" },
-              { kind: "mark", text: "/" },
-            ],
-            [
-              { kind: "req", name: "object" },
-              { kind: "req", name: "name" },
-              { kind: "req", name: "default" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            object: "Object to read from.",
-            name: "Attribute name as a string. It does not have to be a valid identifier.",
-            default: "Fallback returned when the attribute is missing. It has no preset value. Omit this argument and a missing attribute raises AttributeError.",
-          },
-          example: {
-            code: "class Box:\n    n = 3\n\ngetattr(Box, 'missing', 0)",
-            result: "0",
-          },
-        },
-        {
-          id: "globals",
-          name: "globals",
-          purpose: "Return the dictionary of the current module's global namespace. Inside a function this is the module where the function was defined, not where it was called.",
-          forms: [[]],
-          params: {},
-          example: { code: "isinstance(globals(), dict)", result: "True" },
-        },
-        {
-          id: "hasattr",
-          name: "hasattr",
-          purpose: "Return True if the object has an attribute of that name. Implemented by calling getattr and catching AttributeError.",
-          forms: [[
-            { kind: "req", name: "object" },
-            { kind: "req", name: "name" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            object: "Object to test.",
-            name: "Attribute name as a string.",
-          },
-          example: {
-            code: "class Box:\n    n = 3\n\nhasattr(Box, 'n')",
-            result: "True",
-          },
-        },
-        {
-          id: "hash",
-          name: "hash",
-          purpose: "Return the integer hash of an object, used by dict and set. Equal numbers share a hash. Hashes of str and bytes are salted and change between processes, so this example uses an int.",
-          forms: [[{ kind: "req", name: "object" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Any hashable object. Lists, dicts, and sets raise TypeError. A class can define __hash__, or set __hash__ = None to refuse hashing.",
-          },
-          example: { code: "hash(123)", result: "123" },
-        },
-        {
-          id: "help",
-          name: "help",
-          purpose: "Show documentation. help() with no argument starts the interactive help prompt. help(object) prints the documentation for that object, module, or topic name.",
-          forms: [
-            [],
-            [{ kind: "req", name: "request" }],
-          ],
-          params: {
-            request: "An object, or a string naming a module, function, keyword, or topic. Leave it out and the help console starts.",
-          },
-          example: {
-            code: "help(len)",
-            result: "Prints the documentation for len.",
-          },
-        },
-        {
-          id: "hex",
-          name: "hex",
-          purpose: "Convert an integer to a lowercase hexadecimal string with a 0x prefix.",
-          forms: [[{ kind: "req", name: "number" }, { kind: "mark", text: "/" }]],
-          params: {
-            number: "An int, or an object with __index__. For a float, use float.hex instead.",
-          },
-          example: { code: "hex(255)", result: "'0xff'" },
-        },
-        {
-          id: "id",
-          name: "id",
-          purpose: "Return an integer that identifies this object for as long as it is alive. In CPython that integer is the object's address. Two names for the same object share an id.",
-          forms: [[{ kind: "req", name: "object" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Any object. The number is unique among objects that are alive at the same time, and it can be reused after the object is gone.",
-          },
-          example: {
-            code: "a = []\nb = a\nid(a) == id(b)",
-            result: "True",
-          },
-        },
-        {
-          id: "input",
-          name: "input",
-          purpose: "Read one line from standard input and return it as a string, without the trailing newline. The prompt is written first and has no newline of its own. End of file raises EOFError.",
-          forms: [[{ kind: "def", name: "prompt", value: "''" }, { kind: "mark", text: "/" }]],
-          params: {
-            prompt: "Text written before reading. Default is the empty string, so input() just waits for a line.",
-          },
-          example: {
-            code: "name = input('Name: ')",
-            result: "The typed line, without its trailing newline.",
-            note: "If the user types Name: Ada and presses Enter, name is 'Ada'.",
-          },
-        },
-        {
-          id: "int",
-          name: "int",
-          purpose: "Convert a number or a numeric string to an integer. int() with no arguments returns 0, because x defaults to 0. Floats are truncated toward zero. A base applies only to a string, bytes, or bytearray.",
-          forms: [
-            [{ kind: "def", name: "x", value: "0" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "x" },
-              { kind: "mark", text: "/" },
-              { kind: "def", name: "base", value: "10" },
-            ],
-          ],
-          params: {
-            x: "Value to convert. Defaults to 0, so a bare int() is 0. When you also pass base, x is required and must be a string, bytes, or bytearray, not a number.",
-            base: "Radix for reading a string, from 2 to 36. Default 10. Pass 0 to honor a 0b, 0o, or 0x prefix. int('1010', 2) and int('1010', base=2) both work.",
-          },
-          example: { code: "int('1010', 2)", result: "10" },
-        },
-        {
-          id: "isinstance",
-          name: "isinstance",
-          purpose: "Return True if the object is an instance of the class, or of a subclass of it. Prefer this to comparing type(obj) is SomeClass, because subclasses count.",
-          forms: [[
-            { kind: "req", name: "object" },
-            { kind: "req", name: "classinfo" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            object: "Value to test.",
-            classinfo: "A class, a tuple of classes, or a union such as int | str. True if the object matches any of them.",
-          },
-          example: { code: "isinstance(True, int)", result: "True" },
-        },
-        {
-          id: "issubclass",
-          name: "issubclass",
-          purpose: "Return True if a class is a subclass of another, including the class itself. A tuple of classes matches when any entry matches.",
-          forms: [[
-            { kind: "req", name: "class" },
-            { kind: "req", name: "classinfo" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            class: "The class to test. It must be a class.",
-            classinfo: "A class, a tuple of classes, or a union type.",
-          },
-          example: { code: "issubclass(bool, int)", result: "True" },
-        },
-        {
-          id: "iter",
-          name: "iter",
-          purpose: "Return an iterator. One argument: take it from an iterable. Two arguments: call the callable with no arguments over and over until it returns the sentinel.",
-          forms: [
-            [{ kind: "req", name: "iterable" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "callable" },
-              { kind: "req", name: "sentinel" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            iterable: "An iterable, or a sequence with __getitem__ starting at 0.",
-            callable: "Called with no arguments on every step of the iterator. Used only in the two-argument form.",
-            sentinel: "Stop value. When the callable returns this object, the iterator ends. The sentinel itself is not yielded.",
-          },
-          example: {
-            code: "def counter():\n    counter.n += 1\n    return counter.n\n\ncounter.n = 0\nlist(iter(counter, 3))",
-            result: "[1, 2]",
-          },
-        },
-        {
-          id: "len",
-          name: "len",
-          purpose: "Return the number of items in a sequence or collection. Works for str, bytes, list, tuple, range, dict, set, and frozenset.",
-          forms: [[{ kind: "req", name: "object" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Any object with __len__. A range bigger than the platform can count raises OverflowError.",
-          },
-          example: { code: "len('abc')", result: "3" },
-        },
-        {
-          id: "list",
-          name: "list",
-          purpose: "Build a mutable list. list() with no argument is a new empty list. Otherwise the items are copied from the iterable.",
-          forms: [[{ kind: "def", name: "iterable", value: "()" }, { kind: "mark", text: "/" }]],
-          params: {
-            iterable: "Source of items. Default is empty, so list() is [].",
-          },
-          example: { code: "list('ab')", result: "['a', 'b']" },
-        },
-        {
-          id: "locals",
-          name: "locals",
-          purpose: "Return a mapping of the names in the current local scope. At module level this is the same mapping as globals(). Inside a function, writing into the returned dict does not assign local variables.",
-          forms: [[]],
-          params: {},
-          example: {
-            code: "def f():\n    value = 1\n    return 'value' in locals()\n\nf()",
-            result: "True",
-          },
-        },
-        {
-          id: "map",
-          name: "map",
-          purpose: "Build an iterator that applies a function to each item. Extra iterables are zipped in parallel, and iteration stops when the shortest one ends. The result is lazy.",
-          forms: [[
-            { kind: "req", name: "function" },
-            { kind: "req", name: "iterable" },
-            { kind: "mark", text: "/" },
-            { kind: "opt", name: "*iterables" },
-          ]],
-          params: {
-            function: "Called as function(item) or, with extra iterables, function(a, b, ...).",
-            iterable: "First sequence of items. Required.",
-            "*iterables": "Optional further iterables. The function must accept one argument per iterable.",
-          },
-          example: { code: "list(map(str.upper, ['a', 'b']))", result: "['A', 'B']" },
-        },
-        {
-          id: "max",
-          name: "max",
-          purpose: "Return the largest item. Pass one iterable, or two or more separate values. key picks what to compare. An empty iterable raises ValueError unless you pass default.",
-          forms: [
-            [
-              { kind: "req", name: "iterable" },
-              { kind: "mark", text: "/" },
-              { kind: "mark", text: "*" },
-              { kind: "def", name: "key", value: "None" },
-            ],
-            [
-              { kind: "req", name: "iterable" },
-              { kind: "mark", text: "/" },
-              { kind: "mark", text: "*" },
-              { kind: "req", name: "default" },
-              { kind: "def", name: "key", value: "None" },
-            ],
-            [
-              { kind: "req", name: "arg1" },
-              { kind: "req", name: "arg2" },
-              { kind: "mark", text: "/" },
-              { kind: "opt", name: "*args" },
-              { kind: "def", name: "key", value: "None" },
-            ],
-          ],
-          params: {
-            iterable: "Items to compare. Required in the one-sequence form.",
-            key: "Function of one argument used to decide order. Pass it by name, as in key=str.lower. Default None compares the items themselves. Ties keep the first item.",
-            default: "Value to return when the iterable is empty. Pass it by name, as in default=0. Without it, an empty iterable raises ValueError.",
-            arg1: "First value, when you pass separate arguments instead of one iterable.",
-            arg2: "Second value. At least two separate arguments are required in this form.",
-            "*args": "Further values to compare. Optional.",
-          },
-          example: { code: "max([], default=0)", result: "0" },
-        },
-        {
-          id: "memoryview",
-          name: "memoryview",
-          purpose: "Return a view of a bytes-like object's buffer, without copying it. Indexing a view of bytes yields the integer value of that byte.",
-          forms: [[{ kind: "req", name: "object" }]],
-          params: {
-            object: "An object that supports the buffer protocol, such as bytes or bytearray.",
-          },
-          example: { code: "memoryview(b'AB')[0]", result: "65" },
-        },
-        {
-          id: "min",
-          name: "min",
-          purpose: "Return the smallest item. Same calls as max: one sequence, or two or more values. Pass key and default by name.",
-          forms: [
-            [
-              { kind: "req", name: "iterable" },
-              { kind: "mark", text: "/" },
-              { kind: "mark", text: "*" },
-              { kind: "def", name: "key", value: "None" },
-            ],
-            [
-              { kind: "req", name: "iterable" },
-              { kind: "mark", text: "/" },
-              { kind: "mark", text: "*" },
-              { kind: "req", name: "default" },
-              { kind: "def", name: "key", value: "None" },
-            ],
-            [
-              { kind: "req", name: "arg1" },
-              { kind: "req", name: "arg2" },
-              { kind: "mark", text: "/" },
-              { kind: "opt", name: "*args" },
-              { kind: "def", name: "key", value: "None" },
-            ],
-          ],
-          params: {
-            iterable: "Items to compare.",
-            key: "Function of one argument used to decide order. Pass it by name, as in key=str.lower. Default None compares the items themselves.",
-            default: "Value to return when the iterable is empty. Pass it by name, as in default=0. Without it, an empty iterable raises ValueError.",
-            arg1: "First of two or more separate values.",
-            arg2: "Second separate value.",
-            "*args": "Further values. Optional.",
-          },
-          example: { code: "min([3, 1, 9])", result: "1" },
-        },
-        {
-          id: "next",
-          name: "next",
-          purpose: "Return the next item from an iterator. Without a default, an exhausted iterator raises StopIteration.",
-          forms: [
-            [{ kind: "req", name: "iterator" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "iterator" },
-              { kind: "req", name: "default" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            iterator: "Any iterator. next(it) calls it.__next__().",
-            default: "Value returned when the iterator is exhausted. It has no preset. Omit it and exhaustion raises StopIteration.",
-          },
-          example: { code: "next(iter([]), 0)", result: "0" },
-        },
-        {
-          id: "object",
-          name: "object",
-          purpose: "Return a new featureless object. This is the base of every class. An instance of object itself has no __dict__, so you cannot set arbitrary attributes on it.",
-          forms: [[]],
-          params: {},
-          example: { code: "type(object()).__name__", result: "'object'" },
-        },
-        {
-          id: "oct",
-          name: "oct",
-          purpose: "Convert an integer to an octal string with a 0o prefix.",
-          forms: [[{ kind: "req", name: "number" }, { kind: "mark", text: "/" }]],
-          params: {
-            number: "An int, or an object with __index__.",
-          },
-          example: { code: "oct(8)", result: "'0o10'" },
-        },
-        {
-          id: "open",
-          name: "open",
-          purpose: "Open a file and return a file object. The default mode is 'r', which reads text. In text mode the default encoding is the locale, not UTF-8. Use a 'b' in the mode for bytes, and do not pass encoding then.",
-          forms: [[
-            { kind: "req", name: "file" },
-            { kind: "def", name: "mode", value: "'r'" },
-            { kind: "def", name: "buffering", value: "-1" },
-            { kind: "def", name: "encoding", value: "None" },
-            { kind: "def", name: "errors", value: "None" },
-            { kind: "def", name: "newline", value: "None" },
-            { kind: "def", name: "closefd", value: "True" },
-            { kind: "def", name: "opener", value: "None" },
-          ]],
-          params: {
-            file: "Path to open, or an integer file descriptor. This is the one argument you must pass.",
-            mode: "How to open the file. Default 'r' is read text, the same as 'rt'. 'w' truncates, 'a' appends, 'x' creates, 'b' is binary, '+' allows read and write.",
-            buffering: "Buffering policy. Default -1 picks the usual policy: line buffering for an interactive text stream, otherwise a fixed chunk.",
-            encoding: "Text encoding. Default None means the current locale encoding. Only valid in text mode. Pass 'utf-8' when you want UTF-8 specifically.",
-            errors: "How decode and encode errors are handled in text mode. Default None acts like 'strict'.",
-            newline: "How newlines are translated. Default None enables universal newlines on read and writes os.linesep for each \\n.",
-            closefd: "When file is a descriptor, close it when the file object closes. Default True. Must stay True when file is a path.",
-            opener: "Optional callable used instead of the normal open. It is called as opener(file, flags) and must return a descriptor. Default None.",
-          },
-          example: {
-            code: "with open('notes.txt', encoding='utf-8') as f:\n    text = f.read()",
-            result: "text is the file contents. The file closes at the end of the block.",
-          },
-        },
-        {
-          id: "ord",
-          name: "ord",
-          purpose: "Return the code point of a one-character string. This is the inverse of chr(). A bytes or bytearray of length 1 returns that byte instead.",
-          forms: [[{ kind: "req", name: "character" }, { kind: "mark", text: "/" }]],
-          params: {
-            character: "A string of length 1, or a bytes or bytearray of length 1.",
-          },
-          example: { code: "ord('A')", result: "65" },
-        },
-        {
-          id: "pow",
-          name: "pow",
-          purpose: "Return base raised to exp. With mod, return base ** exp % mod, which for integers is computed more efficiently than the two-step form. A negative exp with mod computes a modular inverse.",
-          forms: [[
-            { kind: "req", name: "base" },
-            { kind: "req", name: "exp" },
-            { kind: "def", name: "mod", value: "None" },
-          ]],
-          params: {
-            base: "The base. pow(base, exp) is the same idea as base ** exp.",
-            exp: "The exponent. A negative exponent with integer base and no mod produces a float.",
-            mod: "Modulus. Default None means no modulus. For ints it must be non-zero. Pass it as the third argument, or as mod=97.",
-          },
-          example: { code: "pow(2, 5, 3)", result: "2" },
-        },
-        {
-          id: "print",
-          name: "print",
-          purpose: "Write values to a text stream. They are converted with str(), joined by sep, and followed by end. print() with no values writes only end. That is why a bare print() moves to the next line: end defaults to a newline, not the values.",
-          forms: [[
-            { kind: "opt", name: "*objects" },
-            { kind: "def", name: "sep", value: "' '" },
-            { kind: "def", name: "end", value: "'\\n'" },
-            { kind: "def", name: "file", value: "None" },
-            { kind: "def", name: "flush", value: "False" },
-          ]],
-          params: {
-            "*objects": "Zero or more values to write. There is no default object, and it is not a newline. Pass nothing and only end is written. sep, end, file, and flush are written by name, as in sep='-'.",
-            sep: "String inserted between values. Default is one space. Write it by name: sep='-'.",
-            end: "String written after the last value. Default is a newline, '\\n'. Write it by name. Pass end='' to stay on the same line.",
-            file: "Where to write. Default None means the screen (sys.stdout). Write it by name: file=some_file. Needs a write(string) method, so a binary file will not work.",
-            flush: "When True, push the output through immediately. Default False. Write it by name: flush=True.",
-          },
-          example: {
-            code: "print('a', 'b', sep='-', end='!')",
-            result: "a-b!",
-            note: "sep joined the values with a hyphen. end wrote ! instead of the default newline.",
-          },
-        },
-        {
-          id: "property",
-          name: "property",
-          purpose: "Build a managed attribute. All four arguments default to None, which is why @property above a method uses that method as the getter and copies its docstring.",
-          forms: [[
-            { kind: "def", name: "fget", value: "None" },
-            { kind: "def", name: "fset", value: "None" },
-            { kind: "def", name: "fdel", value: "None" },
-            { kind: "def", name: "doc", value: "None" },
-          ]],
-          params: {
-            fget: "Getter, called when the attribute is read. Default None. The @property decorator passes the decorated method here.",
-            fset: "Setter, called on assignment. Default None means the attribute is read-only until you add one with @name.setter.",
-            fdel: "Deleter, called on del. Default None.",
-            doc: "Docstring for the property. Default None copies fget's docstring.",
-          },
-          example: {
-            code: "class C:\n    def __init__(self):\n        self._n = 1\n\n    @property\n    def n(self):\n        return self._n\n\nC().n",
-            result: "1",
-          },
-        },
-        {
-          id: "range",
-          name: "range",
-          purpose: "An immutable sequence of integers, stopping before stop. range(stop) starts at 0. That does not mean start defaults to 0 in the longer form: range(start, stop) requires both ends. step defaults to 1.",
-          forms: [
-            [{ kind: "req", name: "stop" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "start" },
-              { kind: "req", name: "stop" },
-              { kind: "def", name: "step", value: "1" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            stop: "End, not included. In the one-argument form this is the only value, and the sequence starts at 0.",
-            start: "First value, included. Required once you use the two- or three-argument form.",
-            step: "Difference between values. Default 1. A negative step counts down. Zero raises ValueError.",
-          },
-          example: { code: "list(range(1, 6, 2))", result: "[1, 3, 5]" },
-        },
-        {
-          id: "repr",
-          name: "repr",
-          purpose: "Return a printable representation of an object. For many built-in values the string is valid Python. A class can define __repr__ to control this.",
-          forms: [[{ kind: "req", name: "object" }, { kind: "mark", text: "/" }]],
-          params: {
-            object: "Any object. If it has no useful representation, the result looks like <ClassName object at 0x...>.",
-          },
-          example: { code: "repr('py')", result: "\"'py'\"" },
-        },
-        {
-          id: "reversed",
-          name: "reversed",
-          purpose: "Return a reverse iterator. The object needs __reversed__, or both __len__ and __getitem__ with indexes starting at 0.",
-          forms: [[{ kind: "req", name: "sequence" }, { kind: "mark", text: "/" }]],
-          params: {
-            sequence: "A sequence to walk from the end. A plain iterator is not enough, because reversed needs a length or __reversed__.",
-          },
-          example: { code: "list(reversed([1, 2, 3]))", result: "[3, 2, 1]" },
-        },
-        {
-          id: "round",
-          name: "round",
-          purpose: "Round a number. Omit ndigits, or pass None, and the result is an int. Ties round toward the even choice, so round(1.5) and round(2.5) are both 2. Binary floats can make a decimal look surprising: round(2.675, 2) is 2.67.",
-          forms: [[
-            { kind: "req", name: "number" },
-            { kind: "def", name: "ndigits", value: "None" },
-          ]],
-          params: {
-            number: "Value to round. A custom object can implement __round__.",
-            ndigits: "Digits after the decimal point. Default None returns the nearest int. Negative values round to tens, hundreds, and so on.",
-          },
-          example: { code: "round(3.14159, 2)", result: "3.14" },
-        },
-        {
-          id: "set",
-          name: "set",
-          purpose: "A mutable set of unique values. No arguments means empty. Later changes are allowed, so a set cannot be a dict key.",
-          forms: [[{ kind: "def", name: "iterable", value: "()" }, { kind: "mark", text: "/" }]],
-          params: {
-            iterable: "Values to copy in. Duplicates disappear. Default is empty.",
-          },
-          example: { code: "set([1, 1, 2])", result: "{1, 2}" },
-        },
-        {
-          id: "setattr",
-          name: "setattr",
-          purpose: "Assign an attribute by string name. setattr(obj, 'n', 7) is the same as obj.n = 7, including for a new name.",
-          forms: [[
-            { kind: "req", name: "object" },
-            { kind: "req", name: "name" },
-            { kind: "req", name: "value" },
-            { kind: "mark", text: "/" },
-          ]],
-          params: {
-            object: "Object to modify. It must allow the assignment.",
-            name: "Attribute name as a string. It does not have to be a valid identifier; those names are then only reachable through getattr.",
-            value: "Value to store.",
-          },
-          example: {
-            code: "box = type('Box', (), {})()\nsetattr(box, 'n', 7)\nbox.n",
-            result: "7",
-          },
-        },
-        {
-          id: "slice",
-          name: "slice",
-          purpose: "Build a slice object, the same thing as start:stop:step inside brackets. slice(stop) leaves start and step as None. In the longer form, step defaults to None and start has to be passed.",
-          forms: [
-            [{ kind: "req", name: "stop" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "start" },
-              { kind: "req", name: "stop" },
-              { kind: "def", name: "step", value: "None" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            stop: "Stop index, not included. The only argument of the short form.",
-            start: "Start index. Required in the long form. Pass None yourself to mean the beginning.",
-            step: "Stride. Default None, which means 1 when the slice is used.",
-          },
-          example: { code: "'abcdef'[slice(1, 4)]", result: "'bcd'" },
-        },
-        {
-          id: "sorted",
-          name: "sorted",
-          purpose: "Return a new list, sorted. The original sequence is left alone. Pass key and reverse by name. Equal items keep their original order.",
-          forms: [[
-            { kind: "req", name: "iterable" },
-            { kind: "mark", text: "/" },
-            { kind: "mark", text: "*" },
-            { kind: "def", name: "key", value: "None" },
-            { kind: "def", name: "reverse", value: "False" },
-          ]],
-          params: {
-            iterable: "Items to sort. Required.",
-            key: "Function of one argument. Pass it by name, as in key=str.lower. Default None compares the items directly.",
-            reverse: "Default False sorts ascending. True sorts descending. Pass it by name: reverse=True.",
-          },
-          example: { code: "sorted(['b', 'C', 'a'], key=str.lower)", result: "['a', 'b', 'C']" },
-        },
-        {
-          id: "staticmethod",
-          name: "staticmethod",
-          purpose: "Turn a function into a static method. It receives no automatic first argument: not the instance, and not the class. Call it on the class or on an instance.",
-          forms: [[{ kind: "req", name: "function" }, { kind: "mark", text: "/" }]],
-          params: {
-            function: "The function to wrap. As a decorator, write @staticmethod above the def.",
-          },
-          example: {
-            code: "class C:\n    @staticmethod\n    def add(a, b):\n        return a + b\n\nC.add(2, 3)",
-            result: "5",
-          },
-        },
-        {
-          id: "str",
-          name: "str",
-          purpose: "Return text. str() with no arguments is the empty string. str(obj) is the display form, so str(65) is '65', and str(b'hi') is \"b'hi'\", not a decode. To decode bytes, pass an encoding.",
-          forms: [
-            [{ kind: "def", name: "object", value: "''" }],
-            [
-              { kind: "req", name: "object" },
-              { kind: "req", name: "encoding" },
-              { kind: "def", name: "errors", value: "'strict'" },
-            ],
-          ],
-          params: {
-            object: "Value to turn into text. Defaults to '', so str() is empty. When encoding is also passed, object is required and must be bytes-like so it can be decoded.",
-            encoding: "Codec used to decode bytes, such as 'utf-8'. Required in the decoding form. Omit it and bytes are shown with repr-style text instead of being decoded.",
-            errors: "How decoding errors are handled. Default 'strict' raises UnicodeDecodeError.",
-          },
-          example: { code: "str(b'hi', 'utf-8')", result: "'hi'" },
-        },
-        {
-          id: "sum",
-          name: "sum",
-          purpose: "Add the items of an iterable, starting from start. An empty iterable returns start. Do not use sum to join strings; use ''.join.",
-          forms: [[
-            { kind: "req", name: "iterable" },
-            { kind: "mark", text: "/" },
-            { kind: "def", name: "start", value: "0" },
-          ]],
-          params: {
-            iterable: "Numbers to add, left to right. Strings are rejected.",
-            start: "Value added first. Default 0. Pass start=[] to concatenate lists, or a keyword: sum(items, start=10).",
-          },
-          example: { code: "sum([1, 2, 3], start=10)", result: "16" },
-        },
-        {
-          id: "super",
-          name: "super",
-          purpose: "Return a proxy that finds methods on the next class in the method resolution order. Inside a method, the no-argument form is the one you want. super(type) alone is unbound.",
-          forms: [
-            [],
-            [
-              { kind: "req", name: "type" },
-              { kind: "def", name: "object_or_type", value: "None" },
-              { kind: "mark", text: "/" },
-            ],
-          ],
-          params: {
-            type: "The class to start after. Required in the explicit form. The zero-argument form fills this in as the class that contains the method.",
-            object_or_type: "The instance, or subclass, whose parent super should find. Default None leaves it unset, which is rarely what you want outside a method.",
-          },
-          example: {
-            code: "class A:\n    def greet(self):\n        return 'A'\n\nclass B(A):\n    def greet(self):\n        return super().greet() + 'B'\n\nB().greet()",
-            result: "'AB'",
-          },
-        },
-        {
-          id: "tuple",
-          name: "tuple",
-          purpose: "Build an immutable sequence. tuple() with no argument is the empty tuple (). If the argument is already a tuple, that same object is returned.",
-          forms: [[{ kind: "def", name: "iterable", value: "()" }, { kind: "mark", text: "/" }]],
-          params: {
-            iterable: "Items to copy. Default is empty.",
-          },
-          example: { code: "tuple('ab')", result: "('a', 'b')" },
-        },
-        {
-          id: "type",
-          name: "type",
-          purpose: "With one argument, return the object's type. With a name, bases, and a namespace, create a new class. That three-argument call is the dynamic form of a class statement.",
-          forms: [
-            [{ kind: "req", name: "object" }, { kind: "mark", text: "/" }],
-            [
-              { kind: "req", name: "name" },
-              { kind: "req", name: "bases" },
-              { kind: "req", name: "dict" },
-              { kind: "mark", text: "/" },
-              { kind: "opt", name: "**kwargs" },
-            ],
-          ],
-          params: {
-            object: "Value whose type you want. type(3) is int. To test types, isinstance is usually the better tool, because it counts subclasses.",
-            name: "Name of the new class. It becomes __name__.",
-            bases: "Tuple of base classes. An empty tuple means object.",
-            dict: "Namespace for the class body. It is not a call to dict(); it is the attribute dictionary, and it becomes the class __dict__.",
-            "**kwargs": "Optional keywords passed to the metaclass, the same role as class-statement keywords other than metaclass.",
-          },
-          example: { code: "type(3)", result: "<class 'int'>" },
-        },
-        {
-          id: "vars",
-          name: "vars",
-          purpose: "Return an object's __dict__. With no argument, vars() behaves like locals(). Objects without a __dict__, such as a slotted class, raise TypeError.",
-          forms: [
-            [],
-            [{ kind: "req", name: "object" }, { kind: "mark", text: "/" }],
-          ],
-          params: {
-            object: "A module, class, instance, or other object with a __dict__. Leave it out and you get the local namespace instead.",
-          },
-          example: {
-            code: "class Box:\n    n = 1\n\nvars(Box)['n']",
-            result: "1",
-          },
-        },
-        {
-          id: "zip",
-          name: "zip",
-          purpose: "Pair items from several iterables into tuples, stopping at the shortest. No arguments yields an empty iterator. strict=True raises ValueError if the lengths differ, which is the check you want when they should have matched.",
-          forms: [[
-            { kind: "opt", name: "*iterables" },
-            { kind: "def", name: "strict", value: "False" },
-          ]],
-          params: {
-            "*iterables": "As many sequences as you want. Leave them out and zip() is empty. One sequence yields 1-tuples.",
-            strict: "Default False stops at the shortest sequence. True raises ValueError if the lengths differ. Pass it by name: strict=True.",
-          },
-          example: {
-            code: "list(zip([1, 2], ['a', 'b'], strict=True))",
-            result: "[(1, 'a'), (2, 'b')]",
-          },
-        },
-        {
-          id: "__import__",
-          name: "__import__",
-          purpose: "The function the import statement calls. Everyday code should use importlib.import_module instead. name is the only argument you must pass. level 0 means an absolute import.",
-          forms: [[
-            { kind: "req", name: "name" },
-            { kind: "def", name: "globals", value: "None" },
-            { kind: "def", name: "locals", value: "None" },
-            { kind: "def", name: "fromlist", value: "()" },
-            { kind: "def", name: "level", value: "0" },
-          ]],
-          params: {
-            name: "Module name to import, such as 'math' or 'spam.ham'.",
-            globals: "Namespace used to work out package context. Default None. The standard implementation uses this only for that context.",
-            locals: "Accepted for symmetry with the import statement. Default None. The standard implementation ignores it.",
-            fromlist: "Names imported with from. Default is an empty tuple, and then a dotted name returns the top-level package. A non-empty list returns the named module instead.",
-            level: "How many parent packages to climb for a relative import. Default 0 means absolute only.",
-          },
-          example: { code: "__import__('math').sqrt(4)", result: "2.0" },
-        },
-      ],
-    },
+CHEATSHEET.sections.push({
+  id: "functions",
+  title: "Built-in functions",
+  order: [
+    "print",
+    "len",
+    "range",
+    "str",
+    "int",
+    "float",
+    "list",
+    "dict",
+    "set",
+    "tuple",
+    "bool",
+    "type",
+    "isinstance",
+    "enumerate",
+    "zip",
+    "sorted",
+    "reversed",
+    "min",
+    "max",
+    "sum",
+    "abs",
+    "round",
+    "open",
+    "input",
+    "map",
+    "filter",
+    "any",
+    "all",
+    "next",
+    "iter",
+    "getattr",
+    "setattr",
+    "hasattr",
+    "super",
+    "repr",
+    "format",
+    "id",
+    "hash",
+    "dir",
+    "help",
+    "pow",
+    "divmod",
+    "hex",
+    "bin",
+    "oct",
+    "ord",
+    "chr",
+    "bytes",
+    "bytearray",
+    "slice",
+    "property",
+    "classmethod",
+    "staticmethod",
+    "object",
+    "callable",
+    "issubclass",
+    "delattr",
+    "vars",
+    "globals",
+    "locals",
+    "frozenset",
+    "complex",
+    "eval",
+    "exec",
+    "compile",
+    "memoryview",
+    "breakpoint",
+    "ascii",
+    "aiter",
+    "anext",
+    "__import__",
   ],
-};
-
-// Shown most-used first, so a glance hits the names you actually forget.
-CHEATSHEET.sections[0].order = [
-  "print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple",
-  "bool", "type", "isinstance", "enumerate", "zip", "sorted", "reversed", "min", "max", "sum",
-  "abs", "round", "open", "input", "map", "filter", "any", "all", "next", "iter",
-  "getattr", "setattr", "hasattr", "super", "repr", "format", "id", "hash", "dir", "help",
-  "pow", "divmod", "hex", "bin", "oct", "ord", "chr", "bytes", "bytearray", "slice",
-  "property", "classmethod", "staticmethod", "object", "callable", "issubclass", "delattr", "vars", "globals", "locals",
-  "frozenset", "complex", "eval", "exec", "compile", "memoryview", "breakpoint", "ascii", "aiter", "anext",
-  "__import__",
-];
+  items: [
+    {
+      id: "print",
+      name: "print",
+      purpose: "Write values to a text stream. They are converted with str(), joined by sep, and followed by end. print() with no values writes only end. That is why a bare print() moves to the next line: end defaults to a newline, not the values.",
+      forms: [[
+        arg.opt("*objects"),
+        arg.def("sep", "' '"),
+        arg.def("end", "'\\n'"),
+        arg.def("file", "None"),
+        arg.def("flush", "False"),
+      ]],
+      params: {
+        "*objects": "Zero or more values to write. There is no default object, and it is not a newline. Pass nothing and only end is written. sep, end, file, and flush are written by name, as in sep='-'.",
+        sep: "String inserted between values. Default is one space. Write it by name: sep='-'.",
+        end: "String written after the last value. Default is a newline, '\\n'. Write it by name. Pass end='' to stay on the same line.",
+        file: "Where to write. Default None means the screen (sys.stdout). Write it by name: file=some_file. Needs a write(string) method, so a binary file will not work.",
+        flush: "When True, push the output through immediately. Default False. Write it by name: flush=True.",
+      },
+      example: {
+        code: "print('a', 'b', sep='-', end='!')",
+        result: "a-b!",
+        note: "sep joined the values with a hyphen. end wrote ! instead of the default newline.",
+      },
+    },
+    {
+      id: "len",
+      name: "len",
+      purpose: "Return the number of items in a sequence or collection. Works for str, bytes, list, tuple, range, dict, set, and frozenset.",
+      forms: [[arg.req("object"), arg.mark("/")]],
+      params: {
+        object: "Any object with __len__. A range bigger than the platform can count raises OverflowError.",
+      },
+      example: { code: "len('abc')", result: "3" },
+    },
+    {
+      id: "range",
+      name: "range",
+      purpose: "An immutable sequence of integers, stopping before stop. range(stop) starts at 0. That does not mean start defaults to 0 in the longer form: range(start, stop) requires both ends. step defaults to 1.",
+      forms: [
+        [arg.req("stop"), arg.mark("/")],
+        [
+          arg.req("start"),
+          arg.req("stop"),
+          arg.def("step", "1"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        stop: "End, not included. In the one-argument form this is the only value, and the sequence starts at 0.",
+        start: "First value, included. Required once you use the two- or three-argument form.",
+        step: "Difference between values. Default 1. A negative step counts down. Zero raises ValueError.",
+      },
+      example: { code: "list(range(1, 6, 2))", result: "[1, 3, 5]" },
+    },
+    {
+      id: "str",
+      name: "str",
+      purpose: "Return text. str() with no arguments is the empty string. str(obj) is the display form, so str(65) is '65', and str(b'hi') is \"b'hi'\", not a decode. To decode bytes, pass an encoding.",
+      forms: [
+        [arg.def("object", "''")],
+        [
+          arg.req("object"),
+          arg.req("encoding"),
+          arg.def("errors", "'strict'"),
+        ],
+      ],
+      params: {
+        object: "Value to turn into text. Defaults to '', so str() is empty. When encoding is also passed, object is required and must be bytes-like so it can be decoded.",
+        encoding: "Codec used to decode bytes, such as 'utf-8'. Required in the decoding form. Omit it and bytes are shown with repr-style text instead of being decoded.",
+        errors: "How decoding errors are handled. Default 'strict' raises UnicodeDecodeError.",
+      },
+      example: { code: "str(b'hi', 'utf-8')", result: "'hi'" },
+    },
+    {
+      id: "int",
+      name: "int",
+      purpose: "Convert a number or a numeric string to an integer. int() with no arguments returns 0, because x defaults to 0. Floats are truncated toward zero. A base applies only to a string, bytes, or bytearray.",
+      forms: [
+        [arg.def("x", "0"), arg.mark("/")],
+        [
+          arg.req("x"),
+          arg.mark("/"),
+          arg.def("base", "10"),
+        ],
+      ],
+      params: {
+        x: "Value to convert. Defaults to 0, so a bare int() is 0. When you also pass base, x is required and must be a string, bytes, or bytearray, not a number.",
+        base: "Radix for reading a string, from 2 to 36. Default 10. Pass 0 to honor a 0b, 0o, or 0x prefix. int('1010', 2) and int('1010', base=2) both work.",
+      },
+      example: { code: "int('1010', 2)", result: "10" },
+    },
+    {
+      id: "float",
+      name: "float",
+      purpose: "Convert a number or a numeric string to a float. float() with no argument is 0.0. Strings may contain a sign, whitespace, or 'inf' and 'nan'.",
+      forms: [[arg.def("number", "0.0"), arg.mark("/")]],
+      params: {
+        number: "A number or a numeric string. Default 0.0. Floats outside the range raise OverflowError.",
+      },
+      example: { code: "float('1.5')", result: "1.5" },
+    },
+    {
+      id: "list",
+      name: "list",
+      purpose: "Build a mutable list. list() with no argument is a new empty list. Otherwise the items are copied from the iterable.",
+      forms: [[arg.def("iterable", "()"), arg.mark("/")]],
+      params: {
+        iterable: "Source of items. Default is empty, so list() is [].",
+      },
+      example: { code: "list('ab')", result: "['a', 'b']" },
+    },
+    {
+      id: "dict",
+      name: "dict",
+      purpose: "Create a dictionary. No arguments means an empty dict. You can copy another dict, pass pairs, or write entries by name, as in dict(a=1).",
+      forms: [
+        [arg.opt("**kwargs")],
+        [
+          arg.req("mapping"),
+          arg.mark("/"),
+          arg.opt("**kwargs"),
+        ],
+        [
+          arg.req("iterable"),
+          arg.mark("/"),
+          arg.opt("**kwargs"),
+        ],
+      ],
+      params: {
+        "**kwargs": "Optional keywords, each stored as an entry. dict(a=1) is {'a': 1}. Leave them out for an empty dict.",
+        mapping: "Another dict, or any mapping, to copy. Pass it in order. dict(mapping=x) does not copy x; it stores a key named mapping.",
+        iterable: "A sequence of pairs, like [('a', 1), ('b', 2)].",
+      },
+      example: { code: "dict([('a', 1), ('b', 2)])", result: "{'a': 1, 'b': 2}" },
+    },
+    {
+      id: "set",
+      name: "set",
+      purpose: "A mutable set of unique values. No arguments means empty. Later changes are allowed, so a set cannot be a dict key.",
+      forms: [[arg.def("iterable", "()"), arg.mark("/")]],
+      params: {
+        iterable: "Values to copy in. Duplicates disappear. Default is empty.",
+      },
+      example: { code: "set([1, 1, 2])", result: "{1, 2}" },
+    },
+    {
+      id: "tuple",
+      name: "tuple",
+      purpose: "Build an immutable sequence. tuple() with no argument is the empty tuple (). If the argument is already a tuple, that same object is returned.",
+      forms: [[arg.def("iterable", "()"), arg.mark("/")]],
+      params: {
+        iterable: "Items to copy. Default is empty.",
+      },
+      example: { code: "tuple('ab')", result: "('a', 'b')" },
+    },
+    {
+      id: "bool",
+      name: "bool",
+      purpose: "Return True or False using the normal truth test. bool() with no argument is False. bool is a subclass of int, and it cannot be subclassed further.",
+      forms: [[arg.def("object", "False"), arg.mark("/")]],
+      params: {
+        object: "Value to test. Defaults to False, so a bare bool() is False. Numbers other than zero, and non-empty containers, are True.",
+      },
+      example: { code: "bool(0)", result: "False" },
+    },
+    {
+      id: "type",
+      name: "type",
+      purpose: "With one argument, return the object's type. With a name, bases, and a namespace, create a new class. That three-argument call is the dynamic form of a class statement.",
+      forms: [
+        [arg.req("object"), arg.mark("/")],
+        [
+          arg.req("name"),
+          arg.req("bases"),
+          arg.req("dict"),
+          arg.mark("/"),
+          arg.opt("**kwargs"),
+        ],
+      ],
+      params: {
+        object: "Value whose type you want. type(3) is int. To test types, isinstance is usually the better tool, because it counts subclasses.",
+        name: "Name of the new class. It becomes __name__.",
+        bases: "Tuple of base classes. An empty tuple means object.",
+        dict: "Namespace for the class body. It is not a call to dict(); it is the attribute dictionary, and it becomes the class __dict__.",
+        "**kwargs": "Optional keywords passed to the metaclass, the same role as class-statement keywords other than metaclass.",
+      },
+      example: { code: "type(3)", result: "<class 'int'>" },
+    },
+    {
+      id: "isinstance",
+      name: "isinstance",
+      purpose: "Return True if the object is an instance of the class, or of a subclass of it. Prefer this to comparing type(obj) is SomeClass, because subclasses count.",
+      forms: [[
+        arg.req("object"),
+        arg.req("classinfo"),
+        arg.mark("/"),
+      ]],
+      params: {
+        object: "Value to test.",
+        classinfo: "A class, a tuple of classes, or a union such as int | str. True if the object matches any of them.",
+      },
+      example: { code: "isinstance(True, int)", result: "True" },
+    },
+    {
+      id: "enumerate",
+      name: "enumerate",
+      purpose: "Pair each item with a count. The count starts at 0 unless you pass start. Each step yields (count, item).",
+      forms: [[
+        arg.req("iterable"),
+        arg.def("start", "0"),
+      ]],
+      params: {
+        iterable: "Any iterable. The count is generated; it is not read from the items.",
+        start: "First count. Default 0. enumerate(items, start=1) or enumerate(items, 1) both work.",
+      },
+      example: { code: "list(enumerate(['a', 'b'], start=1))", result: "[(1, 'a'), (2, 'b')]" },
+    },
+    {
+      id: "zip",
+      name: "zip",
+      purpose: "Pair items from several iterables into tuples, stopping at the shortest. No arguments yields an empty iterator. strict=True raises ValueError if the lengths differ, which is the check you want when they should have matched.",
+      forms: [[
+        arg.opt("*iterables"),
+        arg.def("strict", "False"),
+      ]],
+      params: {
+        "*iterables": "As many sequences as you want. Leave them out and zip() is empty. One sequence yields 1-tuples.",
+        strict: "Default False stops at the shortest sequence. True raises ValueError if the lengths differ. Pass it by name: strict=True.",
+      },
+      example: {
+        code: "list(zip([1, 2], ['a', 'b'], strict=True))",
+        result: "[(1, 'a'), (2, 'b')]",
+      },
+    },
+    {
+      id: "sorted",
+      name: "sorted",
+      purpose: "Return a new list, sorted. The original sequence is left alone. Pass key and reverse by name. Equal items keep their original order.",
+      forms: [[
+        arg.req("iterable"),
+        arg.mark("/"),
+        arg.mark("*"),
+        arg.def("key", "None"),
+        arg.def("reverse", "False"),
+      ]],
+      params: {
+        iterable: "Items to sort. Required.",
+        key: "Function of one argument. Pass it by name, as in key=str.lower. Default None compares the items directly.",
+        reverse: "Default False sorts ascending. True sorts descending. Pass it by name: reverse=True.",
+      },
+      example: { code: "sorted(['b', 'C', 'a'], key=str.lower)", result: "['a', 'b', 'C']" },
+    },
+    {
+      id: "reversed",
+      name: "reversed",
+      purpose: "Return a reverse iterator. The object needs __reversed__, or both __len__ and __getitem__ with indexes starting at 0.",
+      forms: [[arg.req("sequence"), arg.mark("/")]],
+      params: {
+        sequence: "A sequence to walk from the end. A plain iterator is not enough, because reversed needs a length or __reversed__.",
+      },
+      example: { code: "list(reversed([1, 2, 3]))", result: "[3, 2, 1]" },
+    },
+    {
+      id: "min",
+      name: "min",
+      purpose: "Return the smallest item. Same calls as max: one sequence, or two or more values. Pass key and default by name.",
+      forms: [
+        [
+          arg.req("iterable"),
+          arg.mark("/"),
+          arg.mark("*"),
+          arg.def("key", "None"),
+        ],
+        [
+          arg.req("iterable"),
+          arg.mark("/"),
+          arg.mark("*"),
+          arg.req("default"),
+          arg.def("key", "None"),
+        ],
+        [
+          arg.req("arg1"),
+          arg.req("arg2"),
+          arg.mark("/"),
+          arg.opt("*args"),
+          arg.def("key", "None"),
+        ],
+      ],
+      params: {
+        iterable: "Items to compare.",
+        key: "Function of one argument used to decide order. Pass it by name, as in key=str.lower. Default None compares the items themselves.",
+        default: "Value to return when the iterable is empty. Pass it by name, as in default=0. Without it, an empty iterable raises ValueError.",
+        arg1: "First of two or more separate values.",
+        arg2: "Second separate value.",
+        "*args": "Further values. Optional.",
+      },
+      example: { code: "min([3, 1, 9])", result: "1" },
+    },
+    {
+      id: "max",
+      name: "max",
+      purpose: "Return the largest item. Pass one iterable, or two or more separate values. key picks what to compare. An empty iterable raises ValueError unless you pass default.",
+      forms: [
+        [
+          arg.req("iterable"),
+          arg.mark("/"),
+          arg.mark("*"),
+          arg.def("key", "None"),
+        ],
+        [
+          arg.req("iterable"),
+          arg.mark("/"),
+          arg.mark("*"),
+          arg.req("default"),
+          arg.def("key", "None"),
+        ],
+        [
+          arg.req("arg1"),
+          arg.req("arg2"),
+          arg.mark("/"),
+          arg.opt("*args"),
+          arg.def("key", "None"),
+        ],
+      ],
+      params: {
+        iterable: "Items to compare. Required in the one-sequence form.",
+        key: "Function of one argument used to decide order. Pass it by name, as in key=str.lower. Default None compares the items themselves. Ties keep the first item.",
+        default: "Value to return when the iterable is empty. Pass it by name, as in default=0. Without it, an empty iterable raises ValueError.",
+        arg1: "First value, when you pass separate arguments instead of one iterable.",
+        arg2: "Second value. At least two separate arguments are required in this form.",
+        "*args": "Further values to compare. Optional.",
+      },
+      example: { code: "max([], default=0)", result: "0" },
+    },
+    {
+      id: "sum",
+      name: "sum",
+      purpose: "Add the items of an iterable, starting from start. An empty iterable returns start. Do not use sum to join strings; use ''.join.",
+      forms: [[
+        arg.req("iterable"),
+        arg.mark("/"),
+        arg.def("start", "0"),
+      ]],
+      params: {
+        iterable: "Numbers to add, left to right. Strings are rejected.",
+        start: "Value added first. Default 0. Pass start=[] to concatenate lists, or a keyword: sum(items, start=10).",
+      },
+      example: { code: "sum([1, 2, 3], start=10)", result: "16" },
+    },
+    {
+      id: "abs",
+      name: "abs",
+      purpose: "Return the size of a number, ignoring its sign. For a complex number, return the magnitude.",
+      forms: [[arg.req("number"), arg.mark("/")]],
+      params: {
+        number: "An int, a float, or an object with __abs__. Complex numbers are allowed; the result is the distance from zero.",
+      },
+      example: { code: "abs(-3)", result: "3" },
+    },
+    {
+      id: "round",
+      name: "round",
+      purpose: "Round a number. Omit ndigits, or pass None, and the result is an int. Ties round toward the even choice, so round(1.5) and round(2.5) are both 2. Binary floats can make a decimal look surprising: round(2.675, 2) is 2.67.",
+      forms: [[
+        arg.req("number"),
+        arg.def("ndigits", "None"),
+      ]],
+      params: {
+        number: "Value to round. A custom object can implement __round__.",
+        ndigits: "Digits after the decimal point. Default None returns the nearest int. Negative values round to tens, hundreds, and so on.",
+      },
+      example: { code: "round(3.14159, 2)", result: "3.14" },
+    },
+    {
+      id: "open",
+      name: "open",
+      purpose: "Open a file and return a file object. The default mode is 'r', which reads text. In text mode the default encoding is the locale, not UTF-8. Use a 'b' in the mode for bytes, and do not pass encoding then.",
+      forms: [[
+        arg.req("file"),
+        arg.def("mode", "'r'"),
+        arg.def("buffering", "-1"),
+        arg.def("encoding", "None"),
+        arg.def("errors", "None"),
+        arg.def("newline", "None"),
+        arg.def("closefd", "True"),
+        arg.def("opener", "None"),
+      ]],
+      params: {
+        file: "Path to open, or an integer file descriptor. This is the one argument you must pass.",
+        mode: "How to open the file. Default 'r' is read text, the same as 'rt'. 'w' truncates, 'a' appends, 'x' creates, 'b' is binary, '+' allows read and write.",
+        buffering: "Buffering policy. Default -1 picks the usual policy: line buffering for an interactive text stream, otherwise a fixed chunk.",
+        encoding: "Text encoding. Default None means the current locale encoding. Only valid in text mode. Pass 'utf-8' when you want UTF-8 specifically.",
+        errors: "How decode and encode errors are handled in text mode. Default None acts like 'strict'.",
+        newline: "How newlines are translated. Default None enables universal newlines on read and writes os.linesep for each \\n.",
+        closefd: "When file is a descriptor, close it when the file object closes. Default True. Must stay True when file is a path.",
+        opener: "Optional callable used instead of the normal open. It is called as opener(file, flags) and must return a descriptor. Default None.",
+      },
+      example: {
+        code: "with open('notes.txt', encoding='utf-8') as f:\n    text = f.read()",
+        result: "text is the file contents. The file closes at the end of the block.",
+      },
+    },
+    {
+      id: "input",
+      name: "input",
+      purpose: "Read one line from standard input and return it as a string, without the trailing newline. The prompt is written first and has no newline of its own. End of file raises EOFError.",
+      forms: [[arg.def("prompt", "''"), arg.mark("/")]],
+      params: {
+        prompt: "Text written before reading. Default is the empty string, so input() just waits for a line.",
+      },
+      example: {
+        code: "name = input('Name: ')",
+        result: "The typed line, without its trailing newline.",
+        note: "If the user types Name: Ada and presses Enter, name is 'Ada'.",
+      },
+    },
+    {
+      id: "map",
+      name: "map",
+      purpose: "Build an iterator that applies a function to each item. Extra iterables are zipped in parallel, and iteration stops when the shortest one ends. The result is lazy.",
+      forms: [[
+        arg.req("function"),
+        arg.req("iterable"),
+        arg.mark("/"),
+        arg.opt("*iterables"),
+      ]],
+      params: {
+        function: "Called as function(item) or, with extra iterables, function(a, b, ...).",
+        iterable: "First sequence of items. Required.",
+        "*iterables": "Optional further iterables. The function must accept one argument per iterable.",
+      },
+      example: { code: "list(map(str.upper, ['a', 'b']))", result: "['A', 'B']" },
+    },
+    {
+      id: "filter",
+      name: "filter",
+      purpose: "Build an iterator of the items for which function(item) is true. If function is None, keep the items that are true by themselves. The result is lazy: wrap it in list() to see it.",
+      forms: [[
+        arg.req("function"),
+        arg.req("iterable"),
+        arg.mark("/"),
+      ]],
+      params: {
+        function: "Called on each item. You still pass it when you want the truth test: use None, which drops zeros, empty strings, and other false values.",
+        iterable: "Source of items.",
+      },
+      example: { code: "list(filter(None, [0, 1, '', 'a']))", result: "[1, 'a']" },
+    },
+    {
+      id: "any",
+      name: "any",
+      purpose: "Return True if at least one element is true. An empty iterable is False.",
+      forms: [[arg.req("iterable"), arg.mark("/")]],
+      params: {
+        iterable: "Items tested with the usual truth rules. Stops at the first true element.",
+      },
+      example: { code: "any([0, '', 5])", result: "True" },
+    },
+    {
+      id: "all",
+      name: "all",
+      purpose: "Return True if every element is true. An empty iterable is True, because nothing in it failed the test.",
+      forms: [[arg.req("iterable"), arg.mark("/")]],
+      params: {
+        iterable: "Items tested with the usual truth rules. Stops at the first false element.",
+      },
+      example: { code: "all([True, 1, 'x'])", result: "True" },
+    },
+    {
+      id: "next",
+      name: "next",
+      purpose: "Return the next item from an iterator. Without a default, an exhausted iterator raises StopIteration.",
+      forms: [
+        [arg.req("iterator"), arg.mark("/")],
+        [
+          arg.req("iterator"),
+          arg.req("default"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        iterator: "Any iterator. next(it) calls it.__next__().",
+        default: "Value returned when the iterator is exhausted. It has no preset. Omit it and exhaustion raises StopIteration.",
+      },
+      example: { code: "next(iter([]), 0)", result: "0" },
+    },
+    {
+      id: "iter",
+      name: "iter",
+      purpose: "Return an iterator. One argument: take it from an iterable. Two arguments: call the callable with no arguments over and over until it returns the sentinel.",
+      forms: [
+        [arg.req("iterable"), arg.mark("/")],
+        [
+          arg.req("callable"),
+          arg.req("sentinel"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        iterable: "An iterable, or a sequence with __getitem__ starting at 0.",
+        callable: "Called with no arguments on every step of the iterator. Used only in the two-argument form.",
+        sentinel: "Stop value. When the callable returns this object, the iterator ends. The sentinel itself is not yielded.",
+      },
+      example: {
+        code: "def counter():\n    counter.n += 1\n    return counter.n\n\ncounter.n = 0\nlist(iter(counter, 3))",
+        result: "[1, 2]",
+      },
+    },
+    {
+      id: "getattr",
+      name: "getattr",
+      purpose: "Read an attribute by string name. getattr(obj, 'n') is obj.n. Without a default, a missing name raises AttributeError.",
+      forms: [
+        [
+          arg.req("object"),
+          arg.req("name"),
+          arg.mark("/"),
+        ],
+        [
+          arg.req("object"),
+          arg.req("name"),
+          arg.req("default"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        object: "Object to read from.",
+        name: "Attribute name as a string. It does not have to be a valid identifier.",
+        default: "Fallback returned when the attribute is missing. It has no preset value. Omit this argument and a missing attribute raises AttributeError.",
+      },
+      example: {
+        code: "class Box:\n    n = 3\n\ngetattr(Box, 'missing', 0)",
+        result: "0",
+      },
+    },
+    {
+      id: "setattr",
+      name: "setattr",
+      purpose: "Assign an attribute by string name. setattr(obj, 'n', 7) is the same as obj.n = 7, including for a new name.",
+      forms: [[
+        arg.req("object"),
+        arg.req("name"),
+        arg.req("value"),
+        arg.mark("/"),
+      ]],
+      params: {
+        object: "Object to modify. It must allow the assignment.",
+        name: "Attribute name as a string. It does not have to be a valid identifier; those names are then only reachable through getattr.",
+        value: "Value to store.",
+      },
+      example: {
+        code: "box = type('Box', (), {})()\nsetattr(box, 'n', 7)\nbox.n",
+        result: "7",
+      },
+    },
+    {
+      id: "hasattr",
+      name: "hasattr",
+      purpose: "Return True if the object has an attribute of that name. Implemented by calling getattr and catching AttributeError.",
+      forms: [[
+        arg.req("object"),
+        arg.req("name"),
+        arg.mark("/"),
+      ]],
+      params: {
+        object: "Object to test.",
+        name: "Attribute name as a string.",
+      },
+      example: {
+        code: "class Box:\n    n = 3\n\nhasattr(Box, 'n')",
+        result: "True",
+      },
+    },
+    {
+      id: "super",
+      name: "super",
+      purpose: "Return a proxy that finds methods on the next class in the method resolution order. Inside a method, the no-argument form is the one you want. super(type) alone is unbound.",
+      forms: [
+        [],
+        [
+          arg.req("type"),
+          arg.def("object_or_type", "None"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        type: "The class to start after. Required in the explicit form. The zero-argument form fills this in as the class that contains the method.",
+        object_or_type: "The instance, or subclass, whose parent super should find. Default None leaves it unset, which is rarely what you want outside a method.",
+      },
+      example: {
+        code: "class A:\n    def greet(self):\n        return 'A'\n\nclass B(A):\n    def greet(self):\n        return super().greet() + 'B'\n\nB().greet()",
+        result: "'AB'",
+      },
+    },
+    {
+      id: "repr",
+      name: "repr",
+      purpose: "Return a printable representation of an object. For many built-in values the string is valid Python. A class can define __repr__ to control this.",
+      forms: [[arg.req("object"), arg.mark("/")]],
+      params: {
+        object: "Any object. If it has no useful representation, the result looks like <ClassName object at 0x...>.",
+      },
+      example: { code: "repr('py')", result: "\"'py'\"" },
+    },
+    {
+      id: "format",
+      name: "format",
+      purpose: "Format a value with a format spec. format(value, spec) calls type(value).__format__(value, spec). An empty spec is usually the same as str(value).",
+      forms: [[
+        arg.req("value"),
+        arg.def("format_spec", "''"),
+        arg.mark("/"),
+      ]],
+      params: {
+        value: "The object to format.",
+        format_spec: "Spec string such as '04d' or '.2f'. Default is the empty string. See the format specification mini-language.",
+      },
+      example: { code: "format(42, '04d')", result: "'0042'" },
+    },
+    {
+      id: "id",
+      name: "id",
+      purpose: "Return an integer that identifies this object for as long as it is alive. In CPython that integer is the object's address. Two names for the same object share an id.",
+      forms: [[arg.req("object"), arg.mark("/")]],
+      params: {
+        object: "Any object. The number is unique among objects that are alive at the same time, and it can be reused after the object is gone.",
+      },
+      example: {
+        code: "a = []\nb = a\nid(a) == id(b)",
+        result: "True",
+      },
+    },
+    {
+      id: "hash",
+      name: "hash",
+      purpose: "Return the integer hash of an object, used by dict and set. Equal numbers share a hash. Hashes of str and bytes are salted and change between processes, so this example uses an int.",
+      forms: [[arg.req("object"), arg.mark("/")]],
+      params: {
+        object: "Any hashable object. Lists, dicts, and sets raise TypeError. A class can define __hash__, or set __hash__ = None to refuse hashing.",
+      },
+      example: { code: "hash(123)", result: "123" },
+    },
+    {
+      id: "dir",
+      name: "dir",
+      purpose: "List names. With no argument, return the names in the current local scope. With an object, return a sorted list of its attributes. Intended for the interactive prompt; the list can be incomplete.",
+      forms: [
+        [],
+        [arg.req("object"), arg.mark("/")],
+      ],
+      params: {
+        object: "Object whose attribute names you want. If it defines __dir__, that method supplies the list.",
+      },
+      example: {
+        code: "class Box:\n    n = 1\n\n'n' in dir(Box)",
+        result: "True",
+      },
+    },
+    {
+      id: "help",
+      name: "help",
+      purpose: "Show documentation. help() with no argument starts the interactive help prompt. help(object) prints the documentation for that object, module, or topic name.",
+      forms: [
+        [],
+        [arg.req("request")],
+      ],
+      params: {
+        request: "An object, or a string naming a module, function, keyword, or topic. Leave it out and the help console starts.",
+      },
+      example: {
+        code: "help(len)",
+        result: "Prints the documentation for len.",
+      },
+    },
+    {
+      id: "pow",
+      name: "pow",
+      purpose: "Return base raised to exp. With mod, return base ** exp % mod, which for integers is computed more efficiently than the two-step form. A negative exp with mod computes a modular inverse.",
+      forms: [[
+        arg.req("base"),
+        arg.req("exp"),
+        arg.def("mod", "None"),
+      ]],
+      params: {
+        base: "The base. pow(base, exp) is the same idea as base ** exp.",
+        exp: "The exponent. A negative exponent with integer base and no mod produces a float.",
+        mod: "Modulus. Default None means no modulus. For ints it must be non-zero. Pass it as the third argument, or as mod=97.",
+      },
+      example: { code: "pow(2, 5, 3)", result: "2" },
+    },
+    {
+      id: "divmod",
+      name: "divmod",
+      purpose: "Return the quotient and remainder of a divided by b, as one pair. For integers this is (a // b, a % b).",
+      forms: [[
+        arg.req("a"),
+        arg.req("b"),
+        arg.mark("/"),
+      ]],
+      params: {
+        a: "Dividend. Not a complex number.",
+        b: "Divisor. Not a complex number, and not zero.",
+      },
+      example: { code: "divmod(7, 2)", result: "(3, 1)" },
+    },
+    {
+      id: "hex",
+      name: "hex",
+      purpose: "Convert an integer to a lowercase hexadecimal string with a 0x prefix.",
+      forms: [[arg.req("number"), arg.mark("/")]],
+      params: {
+        number: "An int, or an object with __index__. For a float, use float.hex instead.",
+      },
+      example: { code: "hex(255)", result: "'0xff'" },
+    },
+    {
+      id: "bin",
+      name: "bin",
+      purpose: "Convert an integer to a binary string with a 0b prefix. Negative numbers keep the sign in front of the prefix.",
+      forms: [[arg.req("number"), arg.mark("/")]],
+      params: {
+        number: "An int, or an object with __index__ that returns an int.",
+      },
+      example: { code: "bin(10)", result: "'0b1010'" },
+    },
+    {
+      id: "oct",
+      name: "oct",
+      purpose: "Convert an integer to an octal string with a 0o prefix.",
+      forms: [[arg.req("number"), arg.mark("/")]],
+      params: {
+        number: "An int, or an object with __index__.",
+      },
+      example: { code: "oct(8)", result: "'0o10'" },
+    },
+    {
+      id: "ord",
+      name: "ord",
+      purpose: "Return the code point of a one-character string. This is the inverse of chr(). A bytes or bytearray of length 1 returns that byte instead.",
+      forms: [[arg.req("character"), arg.mark("/")]],
+      params: {
+        character: "A string of length 1, or a bytes or bytearray of length 1.",
+      },
+      example: { code: "ord('A')", result: "65" },
+    },
+    {
+      id: "chr",
+      name: "chr",
+      purpose: "Return the one-character string for a Unicode code point. chr(65) is 'A'. This is the inverse of ord(). The valid range is 0 through 1,114,111.",
+      forms: [[arg.req("codepoint"), arg.mark("/")]],
+      params: {
+        codepoint: "An integer from 0 to 0x10FFFF. Values outside that range raise ValueError.",
+      },
+      example: { code: "chr(65)", result: "'A'" },
+    },
+    {
+      id: "bytes",
+      name: "bytes",
+      purpose: "An immutable sequence of integers in the range 0 to 255. bytes() is b''. The constructor accepts the same kinds of values as bytearray.",
+      forms: [
+        [arg.def("source", "b''")],
+        [
+          arg.req("source"),
+          arg.req("encoding"),
+          arg.def("errors", "'strict'"),
+        ],
+      ],
+      params: {
+        source: "Initial contents. Defaults to b''. An int sets the length, filled with zero bytes. A buffer is copied. A string needs encoding.",
+        encoding: "Required when source is a str. Names the codec used to encode it.",
+        errors: "How encoding errors are handled. Default 'strict' raises. Keyword-friendly: errors='ignore' is valid.",
+      },
+      example: { code: "bytes('AB', 'ascii')", result: "b'AB'" },
+    },
+    {
+      id: "bytearray",
+      name: "bytearray",
+      purpose: "A mutable sequence of integers in the range 0 to 255. With no arguments the array is empty. An int argument sets the length and fills it with zero bytes.",
+      forms: [
+        [arg.def("source", "b''")],
+        [
+          arg.req("source"),
+          arg.req("encoding"),
+          arg.def("errors", "'strict'"),
+        ],
+      ],
+      params: {
+        source: "Initial contents. Defaults to b'', an empty array. An int sets the length. An iterable of ints, or a buffer, supplies the bytes. A string is only valid together with encoding.",
+        encoding: "Required when source is a string. The string is encoded to bytes with this codec, such as 'utf-8' or 'ascii'.",
+        errors: "How to handle encoding failures. Default 'strict' raises UnicodeEncodeError. Also 'ignore', 'replace', and the other codecs error handlers.",
+      },
+      example: { code: "bytearray([65, 66])", result: "bytearray(b'AB')" },
+    },
+    {
+      id: "slice",
+      name: "slice",
+      purpose: "Build a slice object, the same thing as start:stop:step inside brackets. slice(stop) leaves start and step as None. In the longer form, step defaults to None and start has to be passed.",
+      forms: [
+        [arg.req("stop"), arg.mark("/")],
+        [
+          arg.req("start"),
+          arg.req("stop"),
+          arg.def("step", "None"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        stop: "Stop index, not included. The only argument of the short form.",
+        start: "Start index. Required in the long form. Pass None yourself to mean the beginning.",
+        step: "Stride. Default None, which means 1 when the slice is used.",
+      },
+      example: { code: "'abcdef'[slice(1, 4)]", result: "'bcd'" },
+    },
+    {
+      id: "property",
+      name: "property",
+      purpose: "Build a managed attribute. All four arguments default to None, which is why @property above a method uses that method as the getter and copies its docstring.",
+      forms: [[
+        arg.def("fget", "None"),
+        arg.def("fset", "None"),
+        arg.def("fdel", "None"),
+        arg.def("doc", "None"),
+      ]],
+      params: {
+        fget: "Getter, called when the attribute is read. Default None. The @property decorator passes the decorated method here.",
+        fset: "Setter, called on assignment. Default None means the attribute is read-only until you add one with @name.setter.",
+        fdel: "Deleter, called on del. Default None.",
+        doc: "Docstring for the property. Default None copies fget's docstring.",
+      },
+      example: {
+        code: "class C:\n    def __init__(self):\n        self._n = 1\n\n    @property\n    def n(self):\n        return self._n\n\nC().n",
+        result: "1",
+      },
+    },
+    {
+      id: "classmethod",
+      name: "classmethod",
+      purpose: "Turn a function into a class method. The method receives the class as its first argument, usually named cls, whether you call it on the class or on an instance.",
+      forms: [[arg.req("function"), arg.mark("/")]],
+      params: {
+        function: "The function to wrap. As a decorator, write @classmethod above the def.",
+      },
+      example: {
+        code: "class C:\n    @classmethod\n    def make(cls):\n        return cls.__name__\n\nC.make()",
+        result: "'C'",
+      },
+    },
+    {
+      id: "staticmethod",
+      name: "staticmethod",
+      purpose: "Turn a function into a static method. It receives no automatic first argument: not the instance, and not the class. Call it on the class or on an instance.",
+      forms: [[arg.req("function"), arg.mark("/")]],
+      params: {
+        function: "The function to wrap. As a decorator, write @staticmethod above the def.",
+      },
+      example: {
+        code: "class C:\n    @staticmethod\n    def add(a, b):\n        return a + b\n\nC.add(2, 3)",
+        result: "5",
+      },
+    },
+    {
+      id: "object",
+      name: "object",
+      purpose: "Return a new featureless object. This is the base of every class. An instance of object itself has no __dict__, so you cannot set arbitrary attributes on it.",
+      forms: [[]],
+      params: {},
+      example: { code: "type(object()).__name__", result: "'object'" },
+    },
+    {
+      id: "callable",
+      name: "callable",
+      purpose: "Return True if the object looks callable. True does not promise the call will succeed. Classes are callable; instances are callable when their class defines __call__.",
+      forms: [[arg.req("object"), arg.mark("/")]],
+      params: {
+        object: "Anything. False means a call will fail. True means it might work.",
+      },
+      example: { code: "callable(len)", result: "True" },
+    },
+    {
+      id: "issubclass",
+      name: "issubclass",
+      purpose: "Return True if a class is a subclass of another, including the class itself. A tuple of classes matches when any entry matches.",
+      forms: [[
+        arg.req("class"),
+        arg.req("classinfo"),
+        arg.mark("/"),
+      ]],
+      params: {
+        class: "The class to test. It must be a class.",
+        classinfo: "A class, a tuple of classes, or a union type.",
+      },
+      example: { code: "issubclass(bool, int)", result: "True" },
+    },
+    {
+      id: "delattr",
+      name: "delattr",
+      purpose: "Delete an attribute by string name. delattr(obj, 'n') is the same as del obj.n.",
+      forms: [[
+        arg.req("object"),
+        arg.req("name"),
+        arg.mark("/"),
+      ]],
+      params: {
+        object: "The object whose attribute is deleted. It must allow the deletion.",
+        name: "Attribute name as a string. It does not have to be a valid identifier.",
+      },
+      example: {
+        code: "box = type('Box', (), {})()\nbox.n = 1\ndelattr(box, 'n')\nhasattr(box, 'n')",
+        result: "False",
+      },
+    },
+    {
+      id: "vars",
+      name: "vars",
+      purpose: "Return an object's __dict__. With no argument, vars() behaves like locals(). Objects without a __dict__, such as a slotted class, raise TypeError.",
+      forms: [
+        [],
+        [arg.req("object"), arg.mark("/")],
+      ],
+      params: {
+        object: "A module, class, instance, or other object with a __dict__. Leave it out and you get the local namespace instead.",
+      },
+      example: {
+        code: "class Box:\n    n = 1\n\nvars(Box)['n']",
+        result: "1",
+      },
+    },
+    {
+      id: "globals",
+      name: "globals",
+      purpose: "Return the dictionary of the current module's global namespace. Inside a function this is the module where the function was defined, not where it was called.",
+      forms: [[]],
+      params: {},
+      example: { code: "isinstance(globals(), dict)", result: "True" },
+    },
+    {
+      id: "locals",
+      name: "locals",
+      purpose: "Return a mapping of the names in the current local scope. At module level this is the same mapping as globals(). Inside a function, writing into the returned dict does not assign local variables.",
+      forms: [[]],
+      params: {},
+      example: {
+        code: "def f():\n    value = 1\n    return 'value' in locals()\n\nf()",
+        result: "True",
+      },
+    },
+    {
+      id: "frozenset",
+      name: "frozenset",
+      purpose: "An immutable set. Duplicate values are dropped, and the value cannot be changed later, so it can be a dict key or a member of another set. No arguments means empty.",
+      forms: [[arg.def("iterable", "()"), arg.mark("/")]],
+      params: {
+        iterable: "Values to copy in. Default is an empty tuple, so frozenset() is empty.",
+      },
+      example: { code: "frozenset([1, 1, 2])", result: "frozenset({1, 2})" },
+    },
+    {
+      id: "complex",
+      name: "complex",
+      purpose: "Build a complex number. No arguments returns 0j. One argument can be a number or a string such as '1+2j'. real and imag default to 0.",
+      forms: [[
+        arg.def("real", "0"),
+        arg.def("imag", "0"),
+      ]],
+      params: {
+        real: "Real part. Default 0. A single string such as '1+2j' is read as a whole complex number.",
+        imag: "Imaginary part. Default 0. complex(imag=-4.5) is -4.5j.",
+      },
+      example: { code: "complex(1, 2)", result: "(1+2j)" },
+    },
+    {
+      id: "eval",
+      name: "eval",
+      purpose: "Evaluate one expression and return its value. This runs the code you give it. globals and locals default to the namespaces of the caller.",
+      forms: [[
+        arg.req("source"),
+        arg.mark("/"),
+        arg.def("globals", "None"),
+        arg.def("locals", "None"),
+      ]],
+      params: {
+        source: "A string containing an expression, or a code object from compile(..., mode='eval').",
+        globals: "Global namespace dictionary. Default None uses the caller's globals. If the dict has no __builtins__ key, the real builtins are inserted.",
+        locals: "Local namespace. Default None uses globals when globals was passed, otherwise the caller's locals.",
+      },
+      example: { code: "eval('2 + 3')", result: "5" },
+    },
+    {
+      id: "exec",
+      name: "exec",
+      purpose: "Execute statements. The return value is always None. Use a namespace dict if you want to read variables the code assigned. This runs the code you give it.",
+      forms: [[
+        arg.req("source"),
+        arg.mark("/"),
+        arg.def("globals", "None"),
+        arg.def("locals", "None"),
+        arg.mark("*"),
+        arg.def("closure", "None"),
+      ]],
+      params: {
+        source: "A string of statements, or a code object. return, yield, and nonlocal are not allowed at the top level of that string.",
+        globals: "Global namespace. Default None means the caller's globals. Must be a dict when you pass one.",
+        locals: "Local namespace. Default None. Any mapping is accepted.",
+        closure: "Only for a code object that uses variables from an outer function. Default None. Leave it out unless you are building that case by hand.",
+      },
+      example: {
+        code: "ns = {}\nexec('x = 2 + 3', ns)\nns['x']",
+        result: "5",
+      },
+    },
+    {
+      id: "compile",
+      name: "compile",
+      purpose: "Compile source into a code object that exec() or eval() can run. mode is 'exec' for statements, 'eval' for one expression, or 'single' for one interactive statement.",
+      forms: [[
+        arg.req("source"),
+        arg.req("filename"),
+        arg.req("mode"),
+        arg.def("flags", "0"),
+        arg.def("dont_inherit", "False"),
+        arg.def("optimize", "-1"),
+      ]],
+      params: {
+        source: "A string of code, a bytes string, or an AST object.",
+        filename: "Name used in tracebacks. Use a real path, or '<string>' when the code did not come from a file.",
+        mode: "'exec', 'eval', or 'single'.",
+        flags: "Compiler flag bits, usually from the ast module. Default 0 means no extra flags. Future-feature flags can be OR-ed in.",
+        dont_inherit: "When true, ignore compiler flags from the surrounding code and use flags alone. Default False.",
+        optimize: "Optimization level. Default -1 uses the interpreter's -O setting. 0 keeps asserts, 1 removes them, 2 also drops docstrings.",
+      },
+      example: {
+        code: "eval(compile('2 + 3', '<string>', 'eval'))",
+        result: "5",
+      },
+    },
+    {
+      id: "memoryview",
+      name: "memoryview",
+      purpose: "Return a view of a bytes-like object's buffer, without copying it. Indexing a view of bytes yields the integer value of that byte.",
+      forms: [[arg.req("object")]],
+      params: {
+        object: "An object that supports the buffer protocol, such as bytes or bytearray.",
+      },
+      example: { code: "memoryview(b'AB')[0]", result: "65" },
+    },
+    {
+      id: "breakpoint",
+      name: "breakpoint",
+      purpose: "Drop into the debugger at this line. It calls sys.breakpointhook(), which by default is pdb.set_trace. Both argument forms are optional and are passed straight through.",
+      forms: [[
+        arg.opt("*args"),
+        arg.opt("**kws"),
+      ]],
+      params: {
+        "*args": "Extra arguments passed on to the debugger. The usual debugger, pdb, expects none.",
+        "**kws": "Extra named arguments passed on to the debugger.",
+      },
+      example: {
+        code: "breakpoint()",
+        result: "Drops into pdb at this line.",
+      },
+    },
+    {
+      id: "ascii",
+      name: "ascii",
+      purpose: "Return a printable representation like repr(), with non-ASCII characters escaped using \\x, \\u, or \\U.",
+      forms: [[arg.req("object"), arg.mark("/")]],
+      params: {
+        object: "Any object. The result is a plain ASCII string, including the quotes repr() would use.",
+      },
+      example: {
+        code: "ascii('café')",
+        result: "\"'caf\\\\xe9'\"",
+        note: "This is what the prompt prints. The string itself contains one backslash: 'caf\\xe9'.",
+      },
+    },
+    {
+      id: "aiter",
+      name: "aiter",
+      purpose: "Return the async iterator of an async iterable. Same idea as iter(), but there is no two-argument sentinel form. Advance the result with anext().",
+      forms: [[arg.req("async_iterable"), arg.mark("/")]],
+      params: {
+        async_iterable: "An object with __aiter__, such as an async generator. aiter(x) calls x.__aiter__().",
+      },
+      example: {
+        code: "import asyncio\n\nasync def gen():\n    yield 1\n\nasync def main():\n    it = aiter(gen())\n    return await anext(it)\n\nasyncio.run(main())",
+        result: "1",
+      },
+    },
+    {
+      id: "anext",
+      name: "anext",
+      purpose: "Return an awaitable for the next value of an async iterator. Await it. With no default, an exhausted iterator raises StopAsyncIteration.",
+      forms: [
+        [arg.req("async_iterator"), arg.mark("/")],
+        [
+          arg.req("async_iterator"),
+          arg.req("default"),
+          arg.mark("/"),
+        ],
+      ],
+      params: {
+        async_iterator: "An object with __anext__. The call returns an awaitable; the value comes out when you await it.",
+        default: "Value to return when the iterator is exhausted. It has no preset: you either pass your own fallback, or leave this form unused and let StopAsyncIteration raise.",
+      },
+      example: {
+        code: "import asyncio\n\nasync def gen():\n    yield 1\n\nasync def main():\n    it = aiter(gen())\n    await anext(it)\n    return await anext(it, 0)\n\nasyncio.run(main())",
+        result: "0",
+      },
+    },
+    {
+      id: "__import__",
+      name: "__import__",
+      purpose: "The function the import statement calls. Everyday code should use importlib.import_module instead. name is the only argument you must pass. level 0 means an absolute import.",
+      forms: [[
+        arg.req("name"),
+        arg.def("globals", "None"),
+        arg.def("locals", "None"),
+        arg.def("fromlist", "()"),
+        arg.def("level", "0"),
+      ]],
+      params: {
+        name: "Module name to import, such as 'math' or 'spam.ham'.",
+        globals: "Namespace used to work out package context. Default None. The standard implementation uses this only for that context.",
+        locals: "Accepted for symmetry with the import statement. Default None. The standard implementation ignores it.",
+        fromlist: "Names imported with from. Default is an empty tuple, and then a dotted name returns the top-level package. A non-empty list returns the named module instead.",
+        level: "How many parent packages to climb for a relative import. Default 0 means absolute only.",
+      },
+      example: { code: "__import__('math').sqrt(4)", result: "2.0" },
+    }
+  ],
+});

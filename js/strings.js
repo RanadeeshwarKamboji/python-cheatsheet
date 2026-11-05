@@ -1,5 +1,6 @@
-// String methods. Same item shape as js/builtins.js.
-// `group` is the type heading. `order` is most-used first.
+// String methods.
+// Required arguments and defaults are marked with arg.req and arg.def from js/constants.js.
+// `order` is the page order, most-used first. The items below follow it.
 
 CHEATSHEET.sections.push({
   id: "strings",
@@ -60,8 +61,8 @@ CHEATSHEET.sections.push({
       name: "split",
       purpose: "Break the text into a list. Leave sep out and it splits on whitespace, and drops the empty pieces. Pass a separator to cut on that string only.",
       forms: [[
-        { kind: "def", name: "sep", value: "None" },
-        { kind: "def", name: "maxsplit", value: "-1" },
+        arg.def("sep", "None"),
+        arg.def("maxsplit", "-1"),
       ]],
       params: {
         sep: "The separator to cut on. Leave it out, or pass None, to split on spaces, tabs, and newlines.",
@@ -74,7 +75,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "join",
       purpose: "Glue strings together. The string you call it on is the separator, and the argument is the pieces. ', '.join(['a', 'b']) is 'a, b'.",
-      forms: [[{ kind: "req", name: "iterable" }]],
+      forms: [[arg.req("iterable")]],
       params: {
         iterable: "The pieces to join. Each one has to be a string. You have to pass this.",
       },
@@ -85,7 +86,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "strip",
       purpose: "Remove characters from both ends. Leave chars out and it removes spaces, tabs, and newlines. The argument is a set of characters, not a word to match.",
-      forms: [[{ kind: "def", name: "chars", value: "None" }]],
+      forms: [[arg.def("chars", "None")]],
       params: {
         chars: "Characters to remove from either end. Leave it out to remove whitespace. 'xxhi'.strip('x') is 'hi'.",
       },
@@ -97,9 +98,9 @@ CHEATSHEET.sections.push({
       name: "replace",
       purpose: "Return a copy with old swapped for new. count=-1, the default, replaces every match.",
       forms: [[
-        { kind: "req", name: "old" },
-        { kind: "req", name: "new" },
-        { kind: "def", name: "count", value: "-1" },
+        arg.req("old"),
+        arg.req("new"),
+        arg.def("count", "-1"),
       ]],
       params: {
         old: "The text to find. You have to pass it.",
@@ -132,9 +133,9 @@ CHEATSHEET.sections.push({
       name: "startswith",
       purpose: "True when the text starts with prefix. prefix can be a tuple, and any one match is enough.",
       forms: [[
-        { kind: "req", name: "prefix" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("prefix"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         prefix: "A string, or a tuple of strings. You have to pass it.",
@@ -149,9 +150,9 @@ CHEATSHEET.sections.push({
       name: "endswith",
       purpose: "True when the text ends with suffix. suffix can be a tuple, and any one match is enough.",
       forms: [[
-        { kind: "req", name: "suffix" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("suffix"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         suffix: "A string, or a tuple of strings. You have to pass it.",
@@ -166,9 +167,9 @@ CHEATSHEET.sections.push({
       name: "find",
       purpose: "Index of the first match, or -1 when the text is missing. index is the same search, but it raises ValueError instead of returning -1.",
       forms: [[
-        { kind: "req", name: "sub" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("sub"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         sub: "The text to look for. You have to pass it.",
@@ -183,8 +184,8 @@ CHEATSHEET.sections.push({
       name: "format",
       purpose: "Fill {0} and {name} fields in the string. Both kinds of values can be left out. '{name}'.format(name='py') is 'py'.",
       forms: [[
-        { kind: "opt", name: "*args" },
-        { kind: "opt", name: "**kwargs" },
+        arg.opt("*args"),
+        arg.opt("**kwargs"),
       ]],
       params: {
         "*args": "Values for {0}, {1}, and the rest. Leave them out when the string has no numbered fields.",
@@ -198,8 +199,8 @@ CHEATSHEET.sections.push({
       name: "rsplit",
       purpose: "Same as split, but maxsplit counts from the right. Useful when you want the tail in its own piece.",
       forms: [[
-        { kind: "def", name: "sep", value: "None" },
-        { kind: "def", name: "maxsplit", value: "-1" },
+        arg.def("sep", "None"),
+        arg.def("maxsplit", "-1"),
       ]],
       params: {
         sep: "The separator to cut on. Leave it out, or pass None, to split on whitespace.",
@@ -212,7 +213,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "splitlines",
       purpose: "Break the text on line boundaries. Unlike split('\\n'), a blank line stays as an empty string, and a trailing newline does not add an extra piece.",
-      forms: [[{ kind: "def", name: "keepends", value: "False" }]],
+      forms: [[arg.def("keepends", "False")]],
       params: {
         keepends: "Pass keepends=True to leave the line break on each piece. Default False removes it.",
       },
@@ -223,7 +224,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "lstrip",
       purpose: "Remove characters from the start only. Leave chars out and it removes leading whitespace.",
-      forms: [[{ kind: "def", name: "chars", value: "None" }]],
+      forms: [[arg.def("chars", "None")]],
       params: {
         chars: "Characters to remove from the start. Leave it out to remove whitespace. This is a set of characters, not a word.",
       },
@@ -234,7 +235,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "rstrip",
       purpose: "Remove characters from the end only. Leave chars out and it removes trailing whitespace.",
-      forms: [[{ kind: "def", name: "chars", value: "None" }]],
+      forms: [[arg.def("chars", "None")]],
       params: {
         chars: "Characters to remove from the end. Leave it out to remove whitespace. This is a set of characters, not a word.",
       },
@@ -246,9 +247,9 @@ CHEATSHEET.sections.push({
       name: "count",
       purpose: "How many non-overlapping times sub appears. A missing sub counts as 0.",
       forms: [[
-        { kind: "req", name: "sub" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("sub"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         sub: "The text to count. You have to pass it.",
@@ -263,9 +264,9 @@ CHEATSHEET.sections.push({
       name: "index",
       purpose: "Index of the first match. Same search as find, but a missing sub raises ValueError.",
       forms: [[
-        { kind: "req", name: "sub" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("sub"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         sub: "The text to look for. You have to pass it.",
@@ -280,9 +281,9 @@ CHEATSHEET.sections.push({
       name: "rfind",
       purpose: "Index of the last match, or -1 when the text is missing. The right-hand version of find.",
       forms: [[
-        { kind: "req", name: "sub" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("sub"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         sub: "The text to look for. You have to pass it.",
@@ -297,9 +298,9 @@ CHEATSHEET.sections.push({
       name: "rindex",
       purpose: "Index of the last match. Same search as rfind, but a missing sub raises ValueError.",
       forms: [[
-        { kind: "req", name: "sub" },
-        { kind: "opt", name: "start" },
-        { kind: "opt", name: "end" },
+        arg.req("sub"),
+        arg.opt("start"),
+        arg.opt("end"),
       ]],
       params: {
         sub: "The text to look for. You have to pass it.",
@@ -314,8 +315,8 @@ CHEATSHEET.sections.push({
       name: "encode",
       purpose: "Turn the text into bytes. The default encoding is 'utf-8'.",
       forms: [[
-        { kind: "def", name: "encoding", value: "'utf-8'" },
-        { kind: "def", name: "errors", value: "'strict'" },
+        arg.def("encoding", "'utf-8'"),
+        arg.def("errors", "'strict'"),
       ]],
       params: {
         encoding: "How to encode the characters. Default 'utf-8'.",
@@ -328,7 +329,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "partition",
       purpose: "Cut once, at the first sep. The result is the part before it, the separator, and the part after it. A missing sep gives (text, '', '').",
-      forms: [[{ kind: "req", name: "sep" }]],
+      forms: [[arg.req("sep")]],
       params: {
         sep: "The separator to cut on. You have to pass it.",
       },
@@ -339,7 +340,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "rpartition",
       purpose: "Cut once, at the last sep. A missing sep gives ('', '', text), which is the opposite of partition.",
-      forms: [[{ kind: "req", name: "sep" }]],
+      forms: [[arg.req("sep")]],
       params: {
         sep: "The separator to cut on. You have to pass it.",
       },
@@ -350,7 +351,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "removeprefix",
       purpose: "Drop prefix from the start, once. If the text does not start with it, the string comes back unchanged.",
-      forms: [[{ kind: "req", name: "prefix" }]],
+      forms: [[arg.req("prefix")]],
       params: {
         prefix: "The text to drop from the start. You have to pass it.",
       },
@@ -361,7 +362,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "removesuffix",
       purpose: "Drop suffix from the end, once. If the text does not end with it, the string comes back unchanged.",
-      forms: [[{ kind: "req", name: "suffix" }]],
+      forms: [[arg.req("suffix")]],
       params: {
         suffix: "The text to drop from the end. You have to pass it.",
       },
@@ -408,7 +409,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "zfill",
       purpose: "Pad on the left with zeros until the text is width characters long. A leading + or - stays in front of the zeros.",
-      forms: [[{ kind: "req", name: "width" }]],
+      forms: [[arg.req("width")]],
       params: {
         width: "The length to reach. You have to pass it. Shorter than the text does nothing.",
       },
@@ -420,8 +421,8 @@ CHEATSHEET.sections.push({
       name: "ljust",
       purpose: "Pad on the right until the text is width characters long. The default pad is a space.",
       forms: [[
-        { kind: "req", name: "width" },
-        { kind: "def", name: "fillchar", value: "' '" },
+        arg.req("width"),
+        arg.def("fillchar", "' '"),
       ]],
       params: {
         width: "The length to reach. You have to pass it.",
@@ -435,8 +436,8 @@ CHEATSHEET.sections.push({
       name: "rjust",
       purpose: "Pad on the left until the text is width characters long. The default pad is a space.",
       forms: [[
-        { kind: "req", name: "width" },
-        { kind: "def", name: "fillchar", value: "' '" },
+        arg.req("width"),
+        arg.def("fillchar", "' '"),
       ]],
       params: {
         width: "The length to reach. You have to pass it.",
@@ -450,8 +451,8 @@ CHEATSHEET.sections.push({
       name: "center",
       purpose: "Pad on both sides until the text is width characters long. Extra padding goes on the right. The default pad is a space.",
       forms: [[
-        { kind: "req", name: "width" },
-        { kind: "def", name: "fillchar", value: "' '" },
+        arg.req("width"),
+        arg.def("fillchar", "' '"),
       ]],
       params: {
         width: "The length to reach. You have to pass it.",
@@ -572,7 +573,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "translate",
       purpose: "Replace or delete characters using a table from str.maketrans. A map to None deletes that character.",
-      forms: [[{ kind: "req", name: "table" }]],
+      forms: [[arg.req("table")]],
       params: {
         table: "A mapping from character codes to a replacement, or to None to delete. Build it with str.maketrans.",
       },
@@ -584,9 +585,9 @@ CHEATSHEET.sections.push({
       name: "maketrans",
       purpose: "Build the table that translate uses. Call it on the class. One argument is a dict. Two strings map each character in the first to the character in the same place in the second. A third string lists characters to delete.",
       forms: [
-        [{ kind: "req", name: "x" }],
-        [{ kind: "req", name: "x" }, { kind: "req", name: "y" }],
-        [{ kind: "req", name: "x" }, { kind: "req", name: "y" }, { kind: "req", name: "z" }],
+        [arg.req("x")],
+        [arg.req("x"), arg.req("y")],
+        [arg.req("x"), arg.req("y"), arg.req("z")],
       ],
       params: {
         x: "A dict of characters to replacements, or a string of characters to replace. You have to pass it.",
@@ -604,7 +605,7 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "expandtabs",
       purpose: "Replace each tab with spaces out to the next tab stop. The default stop is every 8 columns.",
-      forms: [[{ kind: "def", name: "tabsize", value: "8" }]],
+      forms: [[arg.def("tabsize", "8")]],
       params: {
         tabsize: "How far apart the tab stops are. Default 8.",
       },
@@ -615,11 +616,11 @@ CHEATSHEET.sections.push({
       group: "str",
       name: "format_map",
       purpose: "Same field filling as format, but the values come from one mapping. It does not copy the mapping first, so a dict-like object can fill fields on lookup.",
-      forms: [[{ kind: "req", name: "mapping" }]],
+      forms: [[arg.req("mapping")]],
       params: {
         mapping: "A dict, or anything with lookups, that supplies the {name} fields. You have to pass it.",
       },
       example: { code: "'{n}'.format_map({'n': 3})", result: "'3'" },
-    },
+    }
   ],
 });

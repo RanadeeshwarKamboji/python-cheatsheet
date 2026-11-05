@@ -155,14 +155,13 @@ function renderIndex(section) {
 
   const lede = document.createElement("p");
   lede.className = "lede";
-  lede.textContent = "Pick a group. The most used names are first.";
+  lede.textContent = CHEATSHEET.lede;
 
   const legend = document.createElement("ul");
   legend.className = "legend";
-  legend.append(
-    legendItem("req", "name", " required"),
-    legendItem("def", "name=value", " has a default"),
-  );
+  for (const item of CHEATSHEET.legend) {
+    legend.append(legendItem(item.kind, item.sample, ` ${item.text}`));
+  }
 
   const sentinel = document.createElement("div");
   sentinel.className = "stick-sentinel";
