@@ -78,7 +78,7 @@ body {
 }
 
 .wider-names .sigline {
-  grid-template-columns: 28ch minmax(0, 1fr);
+  grid-template-columns: 30ch minmax(0, 1fr);
 }
 
 .kicker {
