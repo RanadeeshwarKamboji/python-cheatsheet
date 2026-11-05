@@ -198,17 +198,12 @@ function renderIndex(section) {
   const list = document.createElement("div");
   list.className = listClass(current);
 
-  function paintList(list, items, query) {
+  function paintList(list, items) {
     list.replaceChildren();
     if (!items.length) {
       const empty = document.createElement("p");
-      if (!query && current.note) {
-        empty.className = "section-note";
-        empty.textContent = current.note;
-      } else {
-        empty.className = "empty";
-        empty.textContent = "No match.";
-      }
+      empty.className = "empty";
+      empty.textContent = "No match.";
       list.append(empty);
       return;
     }
@@ -233,12 +228,8 @@ function renderIndex(section) {
   function paint() {
     const query = input.value.trim();
     const items = sectionItems(current).filter((item) => matches(item, query));
-    paintList(list, items, query);
-    if (!query && current.note && sectionItems(current).length === 0) {
-      count.textContent = "";
-    } else {
-      count.textContent = `${items.length} ${current.title.toLowerCase()}`;
-    }
+    paintList(list, items);
+    count.textContent = `${items.length} ${current.title.toLowerCase()}`;
   }
 
   input.addEventListener("input", paint);
@@ -248,8 +239,7 @@ function renderIndex(section) {
   foot.className = "foot";
   foot.textContent = "Open a row when the name is not enough.";
 
-  sheet.append(kicker, title, lede, legend, sentinel, searchbar, list);
-  if (sectionItems(current).length) sheet.append(foot);
+  sheet.append(kicker, title, lede, legend, sentinel, searchbar, list, foot);
   app.replaceChildren(sheet);
   document.title = "Python cheat sheet";
 
