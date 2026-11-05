@@ -57,7 +57,6 @@ CHEATSHEET.sections.push({
   items: [
     {
       id: "str-split",
-      group: "str",
       name: "split",
       purpose: "Break the text into a list. Leave sep out and it splits on whitespace, and drops the empty pieces. Pass a separator to cut on that string only.",
       forms: [[
@@ -72,7 +71,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-join",
-      group: "str",
       name: "join",
       purpose: "Glue strings together. The string you call it on is the separator, and the argument is the pieces. ', '.join(['a', 'b']) is 'a, b'.",
       forms: [[arg.req("iterable")]],
@@ -83,7 +81,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-strip",
-      group: "str",
       name: "strip",
       purpose: "Remove characters from both ends. Leave chars out and it removes spaces, tabs, and newlines. The argument is a set of characters, not a word to match.",
       forms: [[arg.def("chars", "None")]],
@@ -94,7 +91,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-replace",
-      group: "str",
       name: "replace",
       purpose: "Return a copy with old swapped for new. count=-1, the default, replaces every match.",
       forms: [[
@@ -111,7 +107,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-lower",
-      group: "str",
       name: "lower",
       purpose: "A copy with every letter in lowercase. For a case-insensitive compare that also folds characters like ß, use casefold.",
       forms: [[]],
@@ -120,7 +115,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-upper",
-      group: "str",
       name: "upper",
       purpose: "A copy with every letter in uppercase.",
       forms: [[]],
@@ -129,7 +123,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-startswith",
-      group: "str",
       name: "startswith",
       purpose: "True when the text starts with prefix. prefix can be a tuple, and any one match is enough.",
       forms: [[
@@ -146,7 +139,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-endswith",
-      group: "str",
       name: "endswith",
       purpose: "True when the text ends with suffix. suffix can be a tuple, and any one match is enough.",
       forms: [[
@@ -163,7 +155,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-find",
-      group: "str",
       name: "find",
       purpose: "Index of the first match, or -1 when the text is missing. index is the same search, but it raises ValueError instead of returning -1.",
       forms: [[
@@ -180,7 +171,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-format",
-      group: "str",
       name: "format",
       purpose: "Fill {0} and {name} fields in the string. Both kinds of values can be left out. '{name}'.format(name='py') is 'py'.",
       forms: [[
@@ -195,7 +185,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-rsplit",
-      group: "str",
       name: "rsplit",
       purpose: "Same as split, but maxsplit counts from the right. Useful when you want the tail in its own piece.",
       forms: [[
@@ -210,7 +199,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-splitlines",
-      group: "str",
       name: "splitlines",
       purpose: "Break the text on line boundaries. Unlike split('\\n'), a blank line stays as an empty string, and a trailing newline does not add an extra piece.",
       forms: [[arg.def("keepends", "False")]],
@@ -221,7 +209,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-lstrip",
-      group: "str",
       name: "lstrip",
       purpose: "Remove characters from the start only. Leave chars out and it removes leading whitespace.",
       forms: [[arg.def("chars", "None")]],
@@ -232,7 +219,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-rstrip",
-      group: "str",
       name: "rstrip",
       purpose: "Remove characters from the end only. Leave chars out and it removes trailing whitespace.",
       forms: [[arg.def("chars", "None")]],
@@ -243,7 +229,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-count",
-      group: "str",
       name: "count",
       purpose: "How many non-overlapping times sub appears. A missing sub counts as 0.",
       forms: [[
@@ -260,7 +245,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-index",
-      group: "str",
       name: "index",
       purpose: "Index of the first match. Same search as find, but a missing sub raises ValueError.",
       forms: [[
@@ -277,7 +261,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-rfind",
-      group: "str",
       name: "rfind",
       purpose: "Index of the last match, or -1 when the text is missing. The right-hand version of find.",
       forms: [[
@@ -294,7 +277,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-rindex",
-      group: "str",
       name: "rindex",
       purpose: "Index of the last match. Same search as rfind, but a missing sub raises ValueError.",
       forms: [[
@@ -311,7 +293,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-encode",
-      group: "str",
       name: "encode",
       purpose: "Turn the text into bytes. The default encoding is 'utf-8'.",
       forms: [[
@@ -326,7 +307,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-partition",
-      group: "str",
       name: "partition",
       purpose: "Cut once, at the first sep. The result is the part before it, the separator, and the part after it. A missing sep gives (text, '', '').",
       forms: [[arg.req("sep")]],
@@ -337,7 +317,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-rpartition",
-      group: "str",
       name: "rpartition",
       purpose: "Cut once, at the last sep. A missing sep gives ('', '', text), which is the opposite of partition.",
       forms: [[arg.req("sep")]],
@@ -348,7 +327,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-removeprefix",
-      group: "str",
       name: "removeprefix",
       purpose: "Drop prefix from the start, once. If the text does not start with it, the string comes back unchanged.",
       forms: [[arg.req("prefix")]],
@@ -359,7 +337,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-removesuffix",
-      group: "str",
       name: "removesuffix",
       purpose: "Drop suffix from the end, once. If the text does not end with it, the string comes back unchanged.",
       forms: [[arg.req("suffix")]],
@@ -370,7 +347,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-capitalize",
-      group: "str",
       name: "capitalize",
       purpose: "A copy with the first character in uppercase and the rest in lowercase.",
       forms: [[]],
@@ -379,7 +355,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-title",
-      group: "str",
       name: "title",
       purpose: "A copy with the first letter of each word in uppercase, and the other letters in lowercase.",
       forms: [[]],
@@ -388,7 +363,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-casefold",
-      group: "str",
       name: "casefold",
       purpose: "A copy folded for case-insensitive compare. Stronger than lower: 'straße'.casefold() is 'strasse'.",
       forms: [[]],
@@ -397,7 +371,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-swapcase",
-      group: "str",
       name: "swapcase",
       purpose: "A copy with uppercase and lowercase flipped.",
       forms: [[]],
@@ -406,7 +379,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-zfill",
-      group: "str",
       name: "zfill",
       purpose: "Pad on the left with zeros until the text is width characters long. A leading + or - stays in front of the zeros.",
       forms: [[arg.req("width")]],
@@ -417,7 +389,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-ljust",
-      group: "str",
       name: "ljust",
       purpose: "Pad on the right until the text is width characters long. The default pad is a space.",
       forms: [[
@@ -432,7 +403,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-rjust",
-      group: "str",
       name: "rjust",
       purpose: "Pad on the left until the text is width characters long. The default pad is a space.",
       forms: [[
@@ -447,7 +417,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-center",
-      group: "str",
       name: "center",
       purpose: "Pad on both sides until the text is width characters long. Extra padding goes on the right. The default pad is a space.",
       forms: [[
@@ -462,7 +431,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isdigit",
-      group: "str",
       name: "isdigit",
       purpose: "True when every character is a digit, including superscripts such as ². Fractions such as ½ are False. Empty text is False.",
       forms: [[]],
@@ -471,7 +439,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isdecimal",
-      group: "str",
       name: "isdecimal",
       purpose: "True when every character is a decimal digit, the kind you can use in an int. ² and ½ are False. Empty text is False.",
       forms: [[]],
@@ -480,7 +447,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isnumeric",
-      group: "str",
       name: "isnumeric",
       purpose: "True when every character is some kind of number, including digits, ², and fractions such as ½. Empty text is False.",
       forms: [[]],
@@ -489,7 +455,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isalpha",
-      group: "str",
       name: "isalpha",
       purpose: "True when every character is a letter. Digits and spaces make it False. Empty text is False.",
       forms: [[]],
@@ -498,7 +463,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isalnum",
-      group: "str",
       name: "isalnum",
       purpose: "True when every character is a letter or a number, and there is at least one. Spaces and punctuation make it False.",
       forms: [[]],
@@ -507,7 +471,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isspace",
-      group: "str",
       name: "isspace",
       purpose: "True when every character is whitespace, such as a space, tab, or newline, and there is at least one.",
       forms: [[]],
@@ -516,7 +479,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-islower",
-      group: "str",
       name: "islower",
       purpose: "True when every letter is lowercase. Digits and spaces are ignored, but there must be at least one letter.",
       forms: [[]],
@@ -525,7 +487,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isupper",
-      group: "str",
       name: "isupper",
       purpose: "True when every letter is uppercase. Digits and spaces are ignored, but there must be at least one letter. 'A1' is True.",
       forms: [[]],
@@ -534,7 +495,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-istitle",
-      group: "str",
       name: "istitle",
       purpose: "True when each word starts with an uppercase letter and the rest of its letters are lowercase. 'Hello World' is True. 'Hello world' is False.",
       forms: [[]],
@@ -543,7 +503,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isidentifier",
-      group: "str",
       name: "isidentifier",
       purpose: "True when the text has the shape of a Python name. It does not check whether the name is a keyword. 'class' is True.",
       forms: [[]],
@@ -552,7 +511,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isascii",
-      group: "str",
       name: "isascii",
       purpose: "True when every character is in the ASCII range. Empty text is True. 'é' is False.",
       forms: [[]],
@@ -561,7 +519,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-isprintable",
-      group: "str",
       name: "isprintable",
       purpose: "True when every character can be shown, with no newline or other control character. Empty text is True.",
       forms: [[]],
@@ -570,7 +527,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-translate",
-      group: "str",
       name: "translate",
       purpose: "Replace or delete characters using a table from str.maketrans. A map to None deletes that character.",
       forms: [[arg.req("table")]],
@@ -581,7 +537,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-maketrans",
-      group: "str",
       name: "maketrans",
       purpose: "Build the table that translate uses. Call it on the class. One argument is a dict. Two strings map each character in the first to the character in the same place in the second. A third string lists characters to delete.",
       forms: [
@@ -602,7 +557,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-expandtabs",
-      group: "str",
       name: "expandtabs",
       purpose: "Replace each tab with spaces out to the next tab stop. The default stop is every 8 columns.",
       forms: [[arg.def("tabsize", "8")]],
@@ -613,7 +567,6 @@ CHEATSHEET.sections.push({
     },
     {
       id: "str-format_map",
-      group: "str",
       name: "format_map",
       purpose: "Same field filling as format, but the values come from one mapping. It does not copy the mapping first, so a dict-like object can fill fields on lookup.",
       forms: [[arg.req("mapping")]],

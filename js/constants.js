@@ -1,5 +1,5 @@
 // Shared cheat sheet shell.
-// Group files only add sections. They do not repeat this.
+// Files in data/ only add sections. They do not repeat this.
 //
 // An argument is one of:
 //   arg.req(name)           red. You have to pass it.
@@ -9,7 +9,7 @@
 //
 // Item shape:
 //   id, name, purpose, forms, params, example { code, result, note? }
-//   group   type heading, such as "int" or "str"
+//   group   optional heading when one section holds several types, such as int and float
 //   kind    "attr" when the name is read, not called
 
 const CHEATSHEET = {
