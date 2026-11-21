@@ -14,11 +14,6 @@ function callName(item) {
   return item.group ? `${item.group}.${item.name}` : item.name;
 }
 
-function sigNameColumn(names) {
-  const widest = Math.max(0, ...names.map((name) => name.length));
-  return widest ? `${widest}ch` : "max-content";
-}
-
 function sectionItems(section) {
   if (!section.order) return section.items;
   const byId = new Map(section.items.map((item) => [item.id, item]));
@@ -202,11 +197,6 @@ function renderIndex(section) {
 
   const list = document.createElement("div");
   list.className = "list";
-  list.style.setProperty(
-    "--sig-name-col",
-    sigNameColumn(sectionItems(current).map((item) => item.name)),
-  );
-
   function paintList(list, items) {
     list.replaceChildren();
     if (!items.length) {
@@ -296,7 +286,6 @@ function renderDetail(item, section) {
     sigHeading.textContent = item.forms.length > 1 ? "Forms" : "Signature";
     const sigs = document.createElement("div");
     sigs.className = "sigs";
-    sigs.style.setProperty("--sig-name-col", sigNameColumn([shownName]));
     for (const form of item.forms) sigs.append(makeSig(shownName, form));
     sheet.append(sigHeading, sigs);
   }

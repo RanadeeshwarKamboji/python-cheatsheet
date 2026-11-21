@@ -176,16 +176,18 @@ a.fn:focus-visible { background: var(--hover); }
 
 .sigline {
   display: grid;
-  grid-template-columns: var(--sig-name-col, max-content) minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   column-gap: 0.8rem;
   align-items: baseline;
   font-size: 0.94rem;
   line-height: 1.45;
+  min-width: 0;
 }
 
 .fname {
   font-weight: 600;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .fargs {
@@ -295,6 +297,15 @@ pre.out {
 @media (max-width: 640px) {
   .sheet { padding: 1.25rem 1rem 2.5rem; }
   .searchbar { margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem; }
-  h1 { font-size: 1.55rem; }
-  .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
+  h1 { font-size: clamp(1.35rem, 7vw, 1.55rem); overflow-wrap: anywhere; }
+  .sigline { grid-template-columns: minmax(0, 1fr); row-gap: 0.05rem; }
+  .detail .sigline { row-gap: 0.05rem; }
+  .tabs { margin-right: -1rem; }
+}
+
+@media (max-width: 360px) {
+  .sheet { padding-right: 0.75rem; padding-left: 0.75rem; }
+  .searchbar { margin-right: -0.75rem; margin-left: -0.75rem; padding-right: 0.75rem; padding-left: 0.75rem; }
+  .purpose { font-size: 1rem; }
+  pre { padding: 0.7rem; font-size: 0.82rem; }
 }
