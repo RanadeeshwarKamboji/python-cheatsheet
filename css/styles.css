@@ -1,5 +1,5 @@
 :root {
-  --bg: #f4f0e8;
+  --bg: #f4f0e8; /*  f7eccb*/
   --ink: #1c1916;
   --muted: #5e564c;
   --line: #ddd4c6;
@@ -71,14 +71,6 @@ body {
 .group {
   margin: 0.95rem 0 0;
   font-weight: 600;
-}
-
-.wide-names .sigline {
-  grid-template-columns: 18ch minmax(0, 1fr);
-}
-
-.wider-names .sigline {
-  grid-template-columns: 30ch minmax(0, 1fr);
 }
 
 .kicker {
@@ -184,7 +176,7 @@ a.fn:focus-visible { background: var(--hover); }
 
 .sigline {
   display: grid;
-  grid-template-columns: 13ch minmax(0, 1fr);
+  grid-template-columns: var(--sig-name-col, max-content) minmax(0, 1fr);
   column-gap: 0.8rem;
   align-items: baseline;
   font-size: 0.94rem;
@@ -304,7 +296,5 @@ pre.out {
   .sheet { padding: 1.25rem 1rem 2.5rem; }
   .searchbar { margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem; }
   h1 { font-size: 1.55rem; }
-  .sigline,
-  .wide-names .sigline,
-  .wider-names .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
+  .sigline { grid-template-columns: 1fr; row-gap: 0.05rem; }
 }

@@ -14,6 +14,11 @@ function callName(item) {
   return item.group ? `${item.group}.${item.name}` : item.name;
 }
 
+function sigNameColumn(names) {
+  const widest = Math.max(0, ...names.map((name) => name.length));
+  return widest ? `${widest}ch` : "max-content";
+}
+
 function sectionItems(section) {
   if (!section.order) return section.items;
   const byId = new Map(section.items.map((item) => [item.id, item]));
@@ -196,7 +201,11 @@ function renderIndex(section) {
   searchbar.append(tabs, input, count);
 
   const list = document.createElement("div");
-  list.className = listClass(current);
+  list.className = "list";
+  list.style.setProperty(
+    "--sig-name-col",
+    sigNameColumn(sectionItems(current).map((item) => item.name)),
+  );
 
   function paintList(list, items) {
     list.replaceChildren();
@@ -250,13 +259,6 @@ function renderIndex(section) {
   observer.observe(sentinel);
 }
 
-function listClass(section) {
-  const widest = Math.max(0, ...sectionItems(section).map((item) => item.name.length));
-  if (widest > 18) return "list wider-names";
-  if (widest > 13) return "list wide-names";
-  return "list";
-}
-
 function legendItem(cls, codeText, rest) {
   const li = document.createElement("li");
   const code = document.createElement("code");
@@ -294,6 +296,7 @@ function renderDetail(item, section) {
     sigHeading.textContent = item.forms.length > 1 ? "Forms" : "Signature";
     const sigs = document.createElement("div");
     sigs.className = "sigs";
+    sigs.style.setProperty("--sig-name-col", sigNameColumn([shownName]));
     for (const form of item.forms) sigs.append(makeSig(shownName, form));
     sheet.append(sigHeading, sigs);
   }
